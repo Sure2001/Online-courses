@@ -1,0 +1,33 @@
+/*********** Slider page ***********/
+/* *{
+  margin: 0px;
+  box-sizing: border-box;
+}
+.slider-container { background: linear-gradient(180deg, #f36ed7, #d891f9);}
+.slick-slider{ text-align: center; height: 82px;}
+.w-full{width: 100%;}
+.text-lg{color: white;opacity: .8;}
+.slick-prev:before { content: '←';}
+.slick-next:before { content: '→';}
+.slick-prev:before{
+  font-family: 'slick';
+  font-size: 20px;
+  line-height: 1;
+  opacity: .75;
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.slick-next:before{
+  font-family: 'slick';
+  font-size: 20px;
+  line-height: 1;
+  opacity: .75;
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.text-center{display: flex;width:100% ; text-align: center;justify-content: space-around;}
+.icons{display: flex;color: white;opacity: .8;}
+.text-lg{color: white;opacity: .8;font-size: 27px;} */
+

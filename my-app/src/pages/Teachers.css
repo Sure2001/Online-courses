@@ -1,0 +1,109 @@
+.staff-container {
+    padding: 40px 20px;
+    text-align: center;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 90px;
+  }
+  .teacher-container p {
+    font-size: 15px;
+    line-height: 30px;
+    font-weight: 500;
+}
+  
+  .teacher-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+  }
+  
+  .teacher-card-custom {
+    background: white;
+    width: 320px;
+    border-radius: 2rem;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header-custom {
+    background: linear-gradient(150deg, #b13ae8, #f36ed7, #b13ae8);
+    height: 150px;
+    position: relative;
+  }
+  
+  .teacher-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid white;
+    object-fit: cover;
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .card-body-custom {
+    padding: 80px 20px 20px;
+  }
+  
+  .teacher-title {
+    color: #777;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .teacher-rating {
+    color: gold;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+  
+  .star {
+    color: #ddd;
+  }
+  
+  .star.filled {
+    color: gold;
+  }
+  
+  .rating-type {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 10px;
+  }
+  
+  .tab-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #b13ae8;
+    margin-bottom: 6px;
+  }
+  
+  .tab-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .tab-buttons button {
+    background: transparent;
+    border: 2px solid #b13ae8;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: black;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .tab-buttons button.active,
+  .tab-buttons button:hover {
+    background: #b13ae8;
+    color: white;
+  }
+  

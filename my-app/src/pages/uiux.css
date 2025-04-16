@@ -1,0 +1,77 @@
+.uiux-container {
+    padding: 24px;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  .teacher-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  .teacher-card:hover {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  }
+  .teacher-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 16px;
+  }
+  .teacher-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  .teacher-title {
+    font-size: 0.9rem;
+    background: linear-gradient(180deg, #d428af, #9f1bdb);
+  -webkit-background-clip: text;
+  color: transparent;
+    margin: 4px 0;
+  }
+  .teacher-bio {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin-top: 12px;
+  }
+  .teacher-socials {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+    font-size: 1.25rem;
+    color: #6b7280;
+  }
+  .teacher-socials a {
+    color: inherit;
+    transition: color 0.3s ease;
+  }
+  
+  .teacher-socials a:hover {
+    color: #9f1bdb;
+  }
+  
+  .teacher-experience {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #1f2937;
+    font-weight: 500;
+  }
+  
+  .teacher-about {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #374151;
+  }
+  
+  .teacher-contact {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #1e40af;
+  }
+  

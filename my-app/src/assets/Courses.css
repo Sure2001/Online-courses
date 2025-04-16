@@ -1,0 +1,227 @@
+/*********** Courses page ***********/
+.courses-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(90deg, #b543ea, #f36ed7);
+  height: auto;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+.courses {
+  text-align: center;
+  color: white;
+}
+.courses p {
+  width: 40%;
+  align-items: center;
+  margin: auto;
+}
+.courses-row {
+  margin-top: 40px;
+  padding: 20px;
+  row-gap: 30px;
+}
+.course-card {
+  background-color: white;
+  padding: 10px;
+  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+}
+.course-card img {
+  width: 100%;
+  height: 200px;
+  border-radius: 20px;
+}
+.card-list {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.card-list ul {
+  padding: 3px;
+  background-color: #b3a4e7;
+  border-radius: 5px;
+  list-style: none;
+}
+.card-list ul li {
+  color: black;
+  font-size: 15px;
+  width: 125px;
+  font-weight: 500;
+}
+.card-list span {
+  background-color: #8261ee;
+  color: white;
+  height: 27px;
+  width: 60px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
+}
+.card-list span svg {
+  color: yellow;
+}
+.card-list-2 {
+  color: black;
+  text-align: start;
+  border-bottom: 1px solid lightgray;
+  padding: 5px 5px 15px 5px;
+}
+.card-list-2 p {
+  font-size: 30px;
+  margin: 0px;
+  font-weight: 600;
+  width: 270px;
+  margin-bottom: 10px;
+  line-height: 34px;
+}
+.card-list-2 span {
+  font-size: 15px;
+  font-weight: 500;
+  margin-right: 30px;
+}
+.card-list-2 span svg {
+  color: #8261ee;
+  margin-right: 8px;
+}
+.card-list-3 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  color: black;
+  font-weight: 600;
+}
+.card-list-3 p {
+  margin: 0px;
+  text-align: start;
+  font-size: 20px;
+}
+.card-list-3 img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+.card-list-3 span {
+  display: flex;
+  align-items: center;
+  color: #8261ee;
+  padding: 5px;
+  height: 35px;
+  width: 136px;
+  font-size: 15px;
+  border-radius: 5px;
+}
+/*********** Responsive ***********/
+
+/* Tablet */
+@media screen and (min-device-width: 481px) and (max-device-width: 768px) {
+  .courses-container {
+    flex-direction: column;
+    height: auto;
+    padding: 20px;
+  }
+
+  .courses p { width: 70%;}
+  .card-list {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .card-list ul {
+    padding: 3px;
+    background-color: #b3a4e7;
+    border-radius: 5px;
+    list-style: none;
+    width: 45%;
+  }
+  .card-list ul li { font-size: 12px; width: 100%;}
+  .card-list-2 p {
+    font-size: 25px;
+    font-weight: 500;
+    width: auto;
+    line-height: 35px;}
+  .card-list-2 span { font-size: 10px; margin-right: 11px;}
+  .card-list-3 {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    color: black;
+    font-weight: 600;
+    font-size: 20px;
+  }
+  .card-list-3 span {
+    width: 71%;
+    font-size: 10px;
+  }
+  .card-list-3 p {
+    font-size: 15px;
+  }
+  .card-list-3 img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin-right: 15px;
+  }
+}
+
+/* Mobile */
+@media only screen and (max-device-width: 480px) {
+  .courses-container {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+
+  .courses p {
+    width: 90%;
+    font-size: 14px;
+  }
+  .card-list {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .card-list ul {
+    padding: 3px;
+    background-color: #b3a4e7;
+    border-radius: 5px;
+    list-style: none;
+    width: 40%;
+  }
+  .card-list ul li {
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .card-list-2 p {
+    font-size: 35px;
+    font-weight: 700;
+    width: auto;
+    line-height: 45px;
+  }
+
+  .card-list-2 span {
+    font-size: 16px;
+    margin-right: 15px;
+  }
+
+  .card-list-3 {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    color: black;
+    font-weight: 600;
+    font-size: 20px;
+  }
+
+  .card-list-3 span {
+    width: 55%;
+    font-size: 14px;
+  }
+  .card-list-3 p {
+    font-size: 20px;
+  }
+}

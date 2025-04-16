@@ -1,0 +1,161 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.navbar-brand {
+  font-size: 40px;
+  font-weight: 500;
+  margin-right: 20%;
+}
+.nav-item,
+.nav-link {
+  color: black;
+  margin-right: 15px;
+  font-weight: 500;
+  font-size: 20px;
+}
+.nav-button {
+  width: 35%;
+  text-align: end;
+}
+.navbar-nav {
+  font-size: 20px;
+}
+.dropdown-menu[data-bs-popper] {
+  top: 141%;
+  left: 0;
+  margin-top: var(--bs-dropdown-spacer);
+}
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: var(--bs-dropdown-item-padding-y) var(--bs-dropdown-item-padding-x);
+  clear: both;
+  font-weight: 400;
+  color: var(--bs-dropdown-link-color);
+  text-align: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  border-radius: var(--bs-dropdown-item-border-radius, 0);
+}
+.dropdown-item:hover {
+  color: var(--bs-dropdown-link-hover-color);
+  background-color: var(--bs-dropdown-link-hover-bg);
+}
+.dropdown-item.active,
+.dropdown-item:active {
+  color: var(--bs-dropdown-link-active-color);
+  text-decoration: none;
+  background-color: #f36ed7;
+}
+.card-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #f36ed7, #d891f9);
+  color: white;
+  font-weight: 600;
+  margin-right:10px;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(90, 59, 231, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(184, 48, 233, 0.4);
+}
+.card-icon {
+  font-size: 1.2rem;
+}
+.btn {
+  display: inline-block;
+  padding: 10px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+}
+.main-1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  color:black;
+  font-weight: 600;
+  margin-right:10px;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(90, 59, 231, 0.3);
+  border: 2px solid #d32bea;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.main-1:hover {
+  border: 2px solid #d32bea;
+  box-shadow: 0 6px 18px rgba(191, 12, 236, 0.4);
+  transform: scale(1.05);
+}
+.main-2 {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, #f36ed7, #d891f9);
+  color: white;
+  font-weight: 600;
+  margin-right:10px;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(90, 59, 231, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.main-2:hover {
+  background: linear-gradient(90deg, #f36ed7, #d891f9);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(224, 99, 255, 0.3);
+}
+
+/* .nav-button .btn {
+  margin-left: 10px;
+} */
+
+/*********** NAVBAR MEDIA ***********/
+@media (max-width: 1024px) {
+  .navbar-brand{margin-right: 30px;}
+  .navbar {padding: 0.5rem;  }
+  /* .main-1, .main-2 {width: 46%;}  } */}
+@media (max-width: 768px) {
+  .navbar {padding: 0.5rem;  }
+  .nav-button{width: 100% !important;margin: 0px;}
+  /* .main-1, .main-2 {width: 46%; margin-top: 5px; }} */}
+@media (max-width: 426px) {
+  .navbar {padding: 0.5rem;  }
+  .nav-button{width: 100% !important;margin: 0px;}
+  /* .main-1, .main-2 {width: 46%; margin-top: 5px; } */
+  .navbar-brand {font-size: 25px;font-weight: 500;}
+  .navbar-toggler{font-size: 15px;}
+  .navbar-nav{font-size: 15px;}}
+@media (max-width: 375px) {
+  .navbar {padding: 0.5rem;  }
+  .nav-button{width: 100% !important;margin: 0px;}
+  /* .main-1, .main-2 {width: 46%; margin-top: 5px; } */
+  .navbar-brand {font-size: 25px;font-weight: 500;}
+  .navbar-toggler{font-size: 15px;}
+  .navbar-nav{font-size: 15px;}}
+@media (max-width: 320px) {
+  .navbar {padding: 0.5rem;  }
+  .nav-button{width: 100% !important;margin: 0px;}
+  /* .main-1, .main-2 {width: 100%; margin-top: 5px; } */
+  .navbar-brand {font-size: 25px;font-weight: 500;}
+  .navbar-toggler{font-size: 15px;}
+  .navbar-nav{font-size: 15px;}}
