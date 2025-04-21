@@ -1,69 +1,150 @@
-import { useState } from "react";
-import { loginUser, forgotPassword } from "../api";
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
-export default function Login() {
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    });
+const SignInPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const [forgotPasswordData, setForgotPasswordData] = useState({
-        email: "",
-        newPassword: ""
-    });
+  const from = location.state?.from || "/";
 
-    const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    try {
+      const response = await fetch("http://localhost:5000/api/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const handleForgotPasswordChange = (e) => {
-        setForgotPasswordData({ ...forgotPasswordData, [e.target.name]: e.target.value });
-    };
+      const data = await response.json();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const response = await loginUser(formData);
-        alert(response.message || response.error);
-    };
+      if (response.ok) {
+        // Save token to localStorage
+        localStorage.setItem("authToken", data.token);
 
-    const handleForgotPasswordSubmit = async (e) => {
-        e.preventDefault();
-        const response = await forgotPassword(forgotPasswordData);
-        alert(response.message || response.error);
-        if (response.message) {
-            setIsForgotPassword(false); // Hide forgot password form on success
-        }
-    };
+        alert("Login successful!");
 
-    return (
-        <div>
-            <h2>{isForgotPassword ? "Forgot Password" : "Login"}</h2>
+        // Navigate to intended page (e.g., /checkout)
+        navigate(from, { replace: true });
+      } else {
+        alert(`Login failed: ${data.message}`);
+      }
+    } catch (err) {
+      console.error("Error during sign in:", err);
+      alert("Something went wrong. Please try again.");
+    }
+  };
 
-            {!isForgotPassword ? (
-                <form onSubmit={handleSubmit}> 
-                    <label >Email</label><br />
-                    <input name="email" type="email" placeholder="Email" onChange={handleChange} required /><br />
-                    <label >Password</label><br />
-                    <input name="password" type="password" placeholder="Password" onChange={handleChange} required /><br />
-                    <button type="submit">Login</button>
+  return (
+    <div style={styles.container}>
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <h2 style={styles.title}>
+          Sign <span style={styles.span}>In</span>
+        </h2>
 
-                    
-            <button onClick={() => setIsForgotPassword(!isForgotPassword)}>
-                {isForgotPassword ? "Back to Login" : "Forgot Password?"}
-            </button>  
-                </form>
-            ) : (
-                <form onSubmit={handleForgotPasswordSubmit}>
-                    <label >Email</label><br />
-                    <input name="email" type="email" placeholder="Email" onChange={handleForgotPasswordChange} required /><br />
-                    <label >New Password</label><br />
-                    <input name="newPassword" type="password" placeholder="New Password" onChange={handleForgotPasswordChange} required /><br />
-                    <button type="submit">Reset Password</button>
-                </form>
-            )}
+        <input
+          type="email"
+          placeholder="Email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={styles.input}
+        />
 
+        <input
+          type="password"
+          placeholder="Password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          style={styles.input}
+        />
+
+        <div style={styles.forgotPassword}>
+          <Link to="/forgot-password">Forgot Password?</Link>
         </div>
-    );
-}
+
+        <button type="submit" style={styles.button}>
+          Sign In
+        </button>
+
+        <div style={styles.register}>
+          Don’t have an account?{" "}
+          <Link to="/signup" style={styles.registerLink}>
+            Sign Up
+          </Link>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    background: "linear-gradient(180deg, #eb4dc9, #af55d9)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  form: {
+    backgroundColor: "#ffffff",
+    padding: "2rem",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    width: "100%",
+    maxWidth: "400px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+    transition: "all 0.3s ease-in-out",
+  },
+  title: {
+    fontSize: "1.5rem",
+    textAlign: "center",
+    color: "#1f2937",
+  },
+  span: {
+    background: "linear-gradient(180deg, #eb4dc9, #af55d9)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    fontWeight: "bold",
+  },
+  input: {
+    padding: "0.75rem 1rem",
+    fontSize: "1rem",
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    outline: "none",
+  },
+  forgotPassword: {
+    textAlign: "right",
+    fontSize: "0.875rem",
+  },
+  button: {
+    background: "linear-gradient(180deg, #eb4dc9, #af55d9)",
+    color: "#ffffff",
+    padding: "0.75rem",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "1rem",
+  },
+  register: {
+    textAlign: "center",
+    fontSize: "0.9rem",
+  },
+  registerLink: {
+    color: "#eb4dc9",
+    textDecoration: "underline",
+  },
+};
+
+export default SignInPage;
