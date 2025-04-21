@@ -51,6 +51,18 @@
   text-decoration: none;
   background-color: #f36ed7;
 }
+/* For side-by-side dropdown items */
+.multi-column-dropdown .dropdown-menu {
+  width: 500px !important; /* Adjust as needed */
+  padding: 1rem;
+}
+
+.dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  gap: 0.5rem 1rem;
+}
+
 .card-button {
   display: inline-flex;
   align-items: center;

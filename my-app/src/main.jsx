@@ -1,16 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client'; // Use this in Vite projects (React 18+)
-import './index.css'; // Your global styles (optional)
-import App from './App'; // Import your root component
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { CartProvider } from "./cartpages/CartContext";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-
-// This creates the root DOM element where your app will be mounted
-const root = ReactDOM.createRoot(document.getElementById('root'));
-
-// Render the App component
-root.render(
-  <React.StrictMode>
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <CartProvider>
     <App />
-  </React.StrictMode>
+  </CartProvider>
 );

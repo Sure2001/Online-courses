@@ -1,182 +1,104 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const cors = require("cors");
-const fs = require("fs");
-const path = require("path");
-const bcrypt = require("bcryptjs");
-const Feedback = require("./models/Feedback");
+const mongoose = require("mongoose");
 
 const app = express();
-app.use(express.json());
+const PORT = 7000;
+const MONGO_URI = "mongodb://localhost:27017/courseskill";
+
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Connect MongoDB
-mongoose.connect("mongodb://localhost:27017/signindb", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB error:", err));
+// Connect to MongoDB
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("MongoDB connection error:", err));
 
-// Models
-const modelMap = {
-  Frontend: {
-    Beginner: require("./models/FrontendBeginner"),
-    Intermediate: require("./models/FrontendIntermediate"),
-    Advanced: require("./models/FrontendAdvanced"),
-  },
-  Backend: {
-    Beginner: require("./models/BackendBeginner"),
-    Intermediate: require("./models/BackendIntermediate"),
-    Advanced: require("./models/BackendAdvanced"),
-  },
-  UIUX: {
-    Beginner: require("./models/UIUXBeginner"),
-    Intermediate: require("./models/UIUXIntermediate"),
-    Advanced: require("./models/UIUXAdvanced"),
-  },
-};
-
-// Utility to save users to a file
-function saveUserToFile(userData, file = "users.json") {
-  const filePath = path.join(__dirname, file);
-  let users = [];
-
-  if (fs.existsSync(filePath)) {
-    const data = fs.readFileSync(filePath);
-    users = JSON.parse(data);
-  }
-
-  users.push(userData);
-  fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
-}
-
-// ✅ SIGN UP ROUTE
-app.post("/api/signup", async (req, res) => {
-  const { username, email, mobile, password, level, courseType } = req.body;
-
-  try {
-    const UserModel = modelMap[courseType]?.[level];
-    if (!UserModel) {
-      return res.status(400).json({ error: "Invalid course type or level" });
-    }
-
-    const existingUser = await UserModel.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ error: "User already exists with this email" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new UserModel({
-      username,
-      email,
-      mobile,
-      password: hashedPassword,
-      level,
-      courseType,
-    });
-
-    await newUser.save();
-
-    saveUserToFile(
-      { username, email, mobile, level, courseType, createdAt: new Date() },
-      `${courseType}_${level}_users.json`
-    );
-
-    res.status(201).json({ message: `${courseType} ${level} user registered successfully` });
-
-  } catch (err) {
-    console.error("Signup error:", err.message);
-    res.status(500).json({ error: "Signup failed", details: err.message });
-  }
+// Define User Schema
+const userSchema = new mongoose.Schema({
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phone: { type: String, required: true },
+    city: { type: String, required: true }
 });
 
-// ✅ LOGIN ROUTE
-app.post("/api/signin", async (req, res) => {
-  const { email, password } = req.body;
+const User = mongoose.model("User", userSchema);
 
-  try {
-    for (const courseType in modelMap) {
-      for (const level in modelMap[courseType]) {
-        const UserModel = modelMap[courseType][level];
-        const user = await UserModel.findOne({ email });
+// Add User
+app.post("/signup", async (req, res) => {
+    const { username, email, password, phone, city } = req.body;
 
-        if (user) {
-          const isMatch = await bcrypt.compare(password, user.password);
-          if (isMatch) {
-            return res.status(200).json({ message: "Login successful" });
-          } else {
-            return res.status(401).json({ message: "Invalid password" });
-          }
+    if (!username || !email || !password || !phone || !city) {
+        return res.status(400).json({ error: "All fields are required" });
+    }
+
+    try {
+        const existingUser = await User.findOne({ $or: [{ email }] });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already exists" });
         }
-      }
-    }
 
-    res.status(404).json({ message: "User not found" });
-  } catch (err) {
-    console.error("Login error:", err.message);
-    res.status(500).json({ message: "Login failed", error: err.message });
-  }
+        const newUser = new User({ username, email, password, phone, city });
+        await newUser.save();
+
+        res.status(201).json({ message: "User added successfully" });
+    } catch (error) {
+        console.error("Error adding user:", error);
+        res.status(500).json({ error: "Server error" });
+    }
 });
 
-// ✅ FORGOT PASSWORD ROUTE
-app.post("/api/forgot-password", async (req, res) => {
-  const { email, newPassword } = req.body;
+// Login
+app.post("/signin", async (req, res) => {
+    const {email, password } = req.body;
 
-  try {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    let userFound = false;
+    if (!email || !password) {
+        return res.status(400).json({ error: "Email, and password are required" });
+    }
 
-    for (const courseType in modelMap) {
-      for (const level in modelMap[courseType]) {
-        const UserModel = modelMap[courseType][level];
-        const user = await UserModel.findOne({ email });
-
-        if (user) {
-          user.password = hashedPassword;
-          await user.save();
-          userFound = true;
-          return res.status(200).json({ message: "Password updated successfully" });
+    try {
+        const user = await User.findOne({ username });
+    
+        if (user.email !== email) {
+            return res.status(400).json({ error: "Invalid email for this username" });
         }
-      }
-    }
+        if (user.password !== password) {
+            return res.status(400).json({ error: "Invalid password" });
+        }
 
-    if (!userFound) {
-      res.status(404).json({ message: "User not found" });
+        res.status(200).json({ message: "Login successful" });
+    } catch (error) {
+        console.error("Error logging in:", error);
+        res.status(500).json({ error: "Server error" });
     }
-  } catch (err) {
-    console.error("Password reset error:", err.message);
-    res.status(500).json({ message: "Password reset failed", error: err.message });
-  }
 });
 
-app.post("/api/feedback", async (req, res) => {
-  const { name, email, subject, message } = req.body;
+// Forgot Password
+app.post("/forgotpassword", async (req, res) => {
+    const {email, newPassword } = req.body;
 
-  try {
-    const newFeedback = new Feedback({ name, email, subject, message });
-    await newFeedback.save();
-
-    // Optional: Save to a local file as well
-    const feedbackData = { name, email, subject, message, date: new Date() };
-    const filePath = path.join(__dirname, "feedback.json");
-
-    let existing = [];
-    if (fs.existsSync(filePath)) {
-      existing = JSON.parse(fs.readFileSync(filePath));
+    if (!email || !newPassword) {
+        return res.status(400).json({ error: "Email, and new password are required" });
     }
-    existing.push(feedbackData);
-    fs.writeFileSync(filePath, JSON.stringify(existing, null, 2));
 
-    res.status(201).json({ message: "Feedback received successfully!" });
-  } catch (error) {
-    console.error("Feedback error:", error.message);
-    res.status(500).json({ message: "Failed to submit feedback", error: error.message });
-  }
-});
+    try {
+        const user = await User.findOne({ email });
 
-// Start the server
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+        if (!user) {
+            return res.status(400).json({ error: "Invalid email" });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        console.error("Error updating password:", error);
+        res.status(500).json({ error: "Server error" });
+    }
 });
