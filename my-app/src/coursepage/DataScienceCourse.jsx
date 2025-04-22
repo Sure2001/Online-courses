@@ -7,8 +7,7 @@ import dataScienceImage from '../images/datascience.jpg';
 import '../assets/CourseStyles.css';
 import { useCart } from '../cartpages/CartContext';
 
-
-export const levelPrices = {
+ const levelPrices = {
   Beginner: 4999,
   Intermediate: 7499,
   Advanced: 9999,

@@ -1,87 +1,62 @@
-.signup-container {
-  min-height: 100vh;
-  background: linear-gradient(90deg, #a855f7, #ec4899);
+.signup-container{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  height: 100vh;
+  background-color: #f8f9fa;
 }
 
-.form-box {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 500px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  animation: fade-in 1s ease;
-}
-
-.form-title {
+h2 {
   text-align: center;
   margin-bottom: 1.5rem;
+  color: #333;
 }
 
-.form-title span {
-  color: #ec4899;
-}
-
-.form-group {
-  margin-bottom: 1rem;
+form {
   display: flex;
   flex-direction: column;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="file"],
-select {
-  padding: 0.6rem;
+input {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  outline: none;
-  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border 0.3s;
 }
 
 input:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.3);
+  border-color: #007bff;
+  outline: none;
 }
 
-.submit-btn {
-  width: 100%;
-  padding: 0.8rem;
-  background: linear-gradient(180deg, #a855f7, #ec4899);
+button {
+  padding: 0.75rem 1rem;
+  background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 0.5rem;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background-color 0.3s;
 }
 
-.submit-btn:hover {
-  background: linear-gradient(180deg, #9333ea, #db2777);
+button:hover {
+  background-color: #0056b3;
 }
 
-.image-preview {
+p {
+  text-align: center;
   margin-top: 1rem;
-  max-width: 100px;
-  max-height: 100px;
-  object-fit: cover;
-  border-radius: 6px;
 }
 
-/* Animations */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
+p button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0;
+  margin-left: 0.25rem;
 }

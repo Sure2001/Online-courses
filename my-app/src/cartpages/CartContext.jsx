@@ -1,91 +1,33 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from 'react';
 
-// Create context
+// 1. Create the CartContext
 const CartContext = createContext();
-const LOCAL_STORAGE_KEY = "myCartData";
 
-// Provider component
+// 2. Export the provider component
 export const CartProvider = ({ children }) => {
-  const userId = "12345"; // Replace with actual logged-in user ID if needed
+  const [cartItems, setCartItems] = useState([]);
 
-  const [cartItems, setCartItems] = useState(() => {
-    const storedCart = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return storedCart ? JSON.parse(storedCart) : [];
-  });
-
-  // Sync cart with localStorage
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  // Add to cart
-  const addToCart = (newItem) => {
-    setCartItems((prevItems) => {
-      const existingIndex = prevItems.findIndex(
-        (item) =>
-          item.title === newItem.title &&
-          item.level === newItem.level &&
-          item.userId === userId
-      );
-
-      if (existingIndex !== -1) {
-        const updatedItems = [...prevItems];
-        updatedItems[existingIndex].quantity += 1;
-        return updatedItems;
-      } else {
-        return [
-          ...prevItems,
-          {
-            ...newItem,
-            quantity: 1,
-            userId,
-          },
-        ];
-      }
-    });
+  // 3. Function to add item (like course level) to cart
+  const addToCart = (item) => {
+    setCartItems((prev) => [...prev, { ...item, quantity: 1 }]);
   };
 
-  // Remove item by index
+  // 4. Optional: remove item by index
   const removeFromCart = (index) => {
-    setCartItems((prevItems) => {
-      const updatedItems = [...prevItems];
-      updatedItems.splice(index, 1);
-      return updatedItems;
-    });
+    const updated = [...cartItems];
+    updated.splice(index, 1);
+    setCartItems(updated);
   };
 
-  // Increment or decrement quantity
-  const updateQuantity = (index, type) => {
-    setCartItems((prevItems) => {
-      const updatedItems = [...prevItems];
-      if (type === "inc") updatedItems[index].quantity += 1;
-      if (type === "dec" && updatedItems[index].quantity > 1) {
-        updatedItems[index].quantity -= 1;
-      }
-      return updatedItems;
-    });
-  };
-
-  // Count items for user (for cart badge or summary)
-  const cartCount = cartItems
-    .filter((item) => item.userId === userId)
-    .reduce((total, item) => total + item.quantity, 0);
-
+  // 5. Expose state and functions to consumers
   return (
     <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        cartCount,
-        userId,
-      }}
+      value={{ cartItems, setCartItems, addToCart, removeFromCart }}
     >
       {children}
     </CartContext.Provider>
   );
 };
 
-// Custom hook
+// 6. Custom hook to use the cart
 export const useCart = () => useContext(CartContext);

@@ -1,104 +1,100 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const mongoose = require("mongoose");
+// server.js
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const bcrypt = require('bcrypt');
 
 const app = express();
-const PORT = 7000;
-const MONGO_URI = "mongodb://localhost:27017/courseskill";
-
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("MongoDB connection error:", err));
+// MongoDB connection
+mongoose.connect('mongodb://localhost:27017/courseskill', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-// Define User Schema
+// User Schema
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    phone: { type: String, required: true },
-    city: { type: String, required: true }
+  username: String,
+  email: { type: String, unique: true },
+  password: String,
+});
+const User = mongoose.model('User', userSchema);
+
+// ── NEW: Order Schema ───────────────────────────────────
+const orderSchema = new mongoose.Schema({
+  billing: {
+    firstName:   String,
+    lastName:    String,
+    company:     String,
+    address1:    String,
+    address2:    String,
+    city:        String,
+    state:       String,
+    zip:         String,
+    phone:       String,
+    email:       String,
+    notes:       String,
+  },
+  items: [
+    {
+      title:    String,
+      level:    String,
+      price:    Number,
+      quantity: Number,
+    }
+  ],
+  subtotal: Number,
+  paymentMethod: String,
+  createdAt: { type: Date, default: Date.now }
+});
+const Order = mongoose.model('Order', orderSchema);
+// Sign Up
+app.post('/api/signup', async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ message: "Email already exists!" });
+
+    const hashed = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, email, password: hashed });
+    await newUser.save();
+    res.json({ message: "User registered successfully!" });
+  } catch (err) {
+    res.status(500).json({ message: "Error creating user" });
+  }
 });
 
-const User = mongoose.model("User", userSchema);
+// Sign In
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "Invalid email!" });
 
-// Add User
-app.post("/signup", async (req, res) => {
-    const { username, email, password, phone, city } = req.body;
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(400).json({ message: "Invalid password!" });
 
-    if (!username || !email || !password || !phone || !city) {
-        return res.status(400).json({ error: "All fields are required" });
-    }
-
-    try {
-        const existingUser = await User.findOne({ $or: [{ email }] });
-        if (existingUser) {
-            return res.status(400).json({ error: "Email already exists" });
-        }
-
-        const newUser = new User({ username, email, password, phone, city });
-        await newUser.save();
-
-        res.status(201).json({ message: "User added successfully" });
-    } catch (error) {
-        console.error("Error adding user:", error);
-        res.status(500).json({ error: "Server error" });
-    }
+    res.json({ message: "Login successful!" });
+  } catch {
+    res.status(500).json({ message: "Login error" });
+  }
 });
 
-// Login
-app.post("/signin", async (req, res) => {
-    const {email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ error: "Email, and password are required" });
-    }
-
-    try {
-        const user = await User.findOne({ username });
-    
-        if (user.email !== email) {
-            return res.status(400).json({ error: "Invalid email for this username" });
-        }
-        if (user.password !== password) {
-            return res.status(400).json({ error: "Invalid password" });
-        }
-
-        res.status(200).json({ message: "Login successful" });
-    } catch (error) {
-        console.error("Error logging in:", error);
-        res.status(500).json({ error: "Server error" });
-    }
+// ── NEW: Create Order ────────────────────────────────────
+app.post('/api/orders', async (req, res) => {
+  try {
+    const order = new Order(req.body);
+    await order.save();
+    res.json({ message: 'Order placed successfully!', orderId: order._id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error placing order' });
+  }
 });
+// ─────────────────────────────────────────────────────────
 
-// Forgot Password
-app.post("/forgotpassword", async (req, res) => {
-    const {email, newPassword } = req.body;
-
-    if (!email || !newPassword) {
-        return res.status(400).json({ error: "Email, and new password are required" });
-    }
-
-    try {
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(400).json({ error: "Invalid email" });
-        }
-
-        user.password = newPassword;
-        await user.save();
-
-        res.status(200).json({ message: "Password changed successfully" });
-    } catch (error) {
-        console.error("Error updating password:", error);
-        res.status(500).json({ error: "Server error" });
-    }
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
 });

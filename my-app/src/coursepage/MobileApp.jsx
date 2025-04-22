@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import { useCart } from '../cartpages/CartContext'; // ✅ Using CartContext
+import { useCart } from '../cartpages/CartContext';
 import 'react-toastify/dist/ReactToastify.css';
 import mobileAppImage from '../images/mobileapp.png';
 import '../assets/CourseStyles.css';

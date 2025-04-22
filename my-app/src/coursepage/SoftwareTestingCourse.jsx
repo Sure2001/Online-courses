@@ -6,7 +6,6 @@ import {
   Card,
   Form,
   Button,
-  Badge,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";

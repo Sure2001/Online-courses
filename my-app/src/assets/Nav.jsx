@@ -10,10 +10,10 @@ import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Nav.css";
 import { FaShoppingCart } from "react-icons/fa";
-import { useCart } from "../cartpages/CartContext"; // make sure path is correct
+// import { useCart } from "../cartpages/CartContext";
 
 const NavigationBar = () => {
-  const { cartCount } = useCart();
+ 
 
   return (
     <>
@@ -51,16 +51,7 @@ const NavigationBar = () => {
               <Link to="/card" className="card-button position-relative d-flex align-items-center gap-1">
                 <FaShoppingCart className="card-icon" />
                 <span>Cart</span>
-                {cartCount > 0 && (
-                  <Badge
-                    pill
-                    bg="danger"
-                    className="position-absolute top-0 start-100 translate-middle"
-                    style={{ fontSize: "0.7rem" }}
-                  >
-                    {cartCount}
-                  </Badge>
-                )}
+               
               </Link>
               <Link to="/signin" className="btn main-1">Sign in</Link>
               <Link to="/signup" className="btn main-2">Sign up</Link>
