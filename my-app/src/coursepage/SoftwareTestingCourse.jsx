@@ -1,27 +1,22 @@
 import React, { useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Form,
-  Button,
-} from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { useCart } from "../cartpages/CartContext";
 import testingImage from "../images/software.jpg";
 import "react-toastify/dist/ReactToastify.css";
 import "../assets/CourseStyles.css";
 
-const levelPrices = {
+export const levelPrices = {
   Beginner: 3999,
   Intermediate: 5999,
   Advanced: 7999,
 };
+
 const SoftwareTestingCourse = () => {
   const [selectedLevels, setSelectedLevels] = useState([]);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handleCheckboxChange = (level) => {
     setSelectedLevels((prev) =>
@@ -47,18 +42,25 @@ const SoftwareTestingCourse = () => {
   };
 
   const handleEnroll = () => {
-    if (selectedLevels.length === 0) {
-      toast.error("⚠️ Please select at least one level before enrolling");
-    } else {
-      toast.success(`✅ Enrolling for: ${selectedLevels.join(", ")}`);
-    }
-  };
+      const allLevels = Object.keys(levelPrices);
+  
+      allLevels.forEach((level) => {
+        addToCart({
+          title: 'Software Testing',
+          level: level,
+          price: levelPrices[level],
+        });
+      });
+  
+      toast.success('✅ Enrolled in Software Testing (All Levels)');
+  
+      // 👇 Redirect to cart page
+      navigate('/card');
+    };
 
   return (
     <Container className="py-5">
-      <h2 className="text-center mb-4">
-        Software Testing
-      </h2>
+      <h2 className="text-center mb-4">Software Testing</h2>
       <Row className="align-items-center">
         <Col md={6}>
           <img
@@ -97,7 +99,13 @@ const SoftwareTestingCourse = () => {
                 <Form.Check
                   key={level}
                   type="checkbox"
-                  label={`${level} - ₹${price.toLocaleString()}`}
+                  label={`${level} - ₹${price.toLocaleString()} ${
+                    level === "Beginner"
+                      ? "(Basics + React)"
+                      : level === "Intermediate"
+                      ? "(Node.js + MongoDB)"
+                      : "(Full Stack + Deployment)"
+                  }`}
                   checked={selectedLevels.includes(level)}
                   onChange={() => handleCheckboxChange(level)}
                 />
@@ -105,29 +113,19 @@ const SoftwareTestingCourse = () => {
             </Form>
 
             <div className="d-flex justify-content-center gap-3 mt-4">
-              <Button
-                variant="outline-primary"
-                onClick={handleAddToCart}
-                disabled={selectedLevels.length === 0}
-              >
+              <Button variant="success" onClick={handleAddToCart}>
                 Add to Cart
               </Button>
-              <Link to="/signin">
-                <Button
-                  variant="primary"
-                  onClick={handleEnroll}
-                  disabled={selectedLevels.length === 0}
-                >
-                  Enroll Now
-                </Button>
-              </Link>
+              <Button variant="primary" onClick={handleEnroll}>
+                Enroll Now
+              </Button>
             </div>
           </Card>
         </Col>
       </Row>
 
       <ToastContainer
-        position="top-center"
+        position="top-end"
         autoClose={5000}
         hideProgressBar={false}
         pauseOnHover

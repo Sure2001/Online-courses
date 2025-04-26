@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Alert, ProgressBar, Form, Table } from 'react-bootstrap';
 import { useCart } from '../cartpages/CartContext';
 import { FaTrash } from 'react-icons/fa';
 import fullstackImage from '../images/fullstack.jpg';
+import BillPage from '../cartpages/BillPage'; // ✅ Billing Modal
 
 const ViewPage = ({ show, onClose }) => {
   const { cartItems, setCartItems } = useCart();
+  const [showBill, setShowBill] = useState(false);     // Billing Page
 
   const FREE_SHIPPING_THRESHOLD = 10000;
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -114,9 +116,13 @@ const ViewPage = ({ show, onClose }) => {
                 <span>Total</span>
                 <span className="text-success">₹{subtotal.toFixed(2)}</span>
               </div>
-              <Button variant="success" className="w-100 mt-3">Proceed to Checkout</Button>
-              
+               <Button variant="success" className="w-100 mt-3" onClick={() => setShowBill(true)}>
+               Proceed to Checkout
+                      </Button>
+              {/* ✅ Billing Page Modal */}
+      <BillPage show={showBill} onClose={() => setShowBill(false)} />
             </div>
+            
           </div>
         </div>
       </Modal.Body>

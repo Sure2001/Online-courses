@@ -6,14 +6,15 @@ import {
   Button,
   Row,
   Col,
-  Alert,
   Toast,
   ToastContainer
 } from 'react-bootstrap';
 import { useCart } from './CartContext';
+import { useNavigate } from 'react-router-dom'; // 🔁 Import for navigation
 
 const BillPage = ({ show, onClose }) => {
   const { cartItems, setCartItems } = useCart();
+  const navigate = useNavigate(); // 🔁 Initialize navigation hook
 
   const [billing, setBilling] = useState({
     firstName: '',
@@ -29,9 +30,10 @@ const BillPage = ({ show, onClose }) => {
     notes: '',
     reviewInvite: false,
   });
+
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * (item.quantity || 1),
@@ -49,15 +51,10 @@ const BillPage = ({ show, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
+    setSuccessMsg('');
 
-    // Basic Validation: Check for required fields
-    if (!billing.firstName.trim() || !billing.lastName.trim()) {
-      setError('First and Last name are required.');
-      return;
-    }
-    if (!billing.address1.trim() || !billing.city.trim() || !billing.zip.trim()) {
-      setError('All required fields must be filled out.');
+    if (!billing.firstName.trim() || !billing.lastName.trim() || !billing.address1.trim() || !billing.city.trim() || !billing.zip.trim()) {
+      setError('Please fill out all required fields.');
       return;
     }
 
@@ -66,22 +63,38 @@ const BillPage = ({ show, onClose }) => {
         billing,
         items: cartItems,
         subtotal,
-        paymentMethod: 'COD', // Cash on Delivery
+        paymentMethod: 'COD',
       };
-      console.log('Payload:', payload); // Debug the payload before sending it to the server
-      const res = await axios.post(
-        'http://localhost:5000/api/orders',
-        payload
-      );
-      console.log('Response:', res); // Debug the response from the server
+
+      const res = await axios.post('http://localhost:5000/api/orders', payload);
 
       const msg = res.data.message || 'Order placed successfully!';
-      setSuccess(msg);
-      setCartItems([msg]); // Clear the cart
-      setShowToast(true); // Show success toast notification
+      setSuccessMsg(msg);
+      setCartItems([]);
+      setBilling({
+        firstName: '',
+        lastName: '',
+        company: '',
+        address1: '',
+        address2: '',
+        city: '',
+        state: 'Bihar',
+        zip: '',
+        phone: '',
+        email: '',
+        notes: '',
+        reviewInvite: false,
+      });
+      setShowToast(true);
+
+      setTimeout(() => {
+        onClose();
+        navigate('/'); // 🔁 Redirect to home page
+      }, 3000);
+
     } catch (err) {
-      console.error('Error:', err); // Log the error for debugging
-      setError(err.response?.data?.message || 'Failed to place order');
+      console.error('Order error:', err);
+      setError(err.response?.data?.message || 'Order placement failed');
     }
   };
 
@@ -93,25 +106,14 @@ const BillPage = ({ show, onClose }) => {
         </Modal.Header>
 
         <Modal.Body>
-          {(error || success) && (
-            <div className="d-flex justify-content-center mb-3">
-              {error ? (
-                <Alert variant="danger" className="text-center mb-0">
-                  {error}
-                </Alert>
-              ) : (
-                <Alert variant="success" className="text-center mb-0">
-                  {success}
-                </Alert>
-              )}
-            </div>
+          {error && (
+            <div className="text-danger text-center fw-semibold mb-3">{error}</div>
           )}
 
           <Form onSubmit={handleSubmit}>
             <Row>
               <Col md={7}>
                 <h5>Billing details</h5>
-
                 <Row>
                   <Col style={{ height: 'auto' }}>
                     <Form.Group className="mb-3">
@@ -162,7 +164,7 @@ const BillPage = ({ show, onClose }) => {
                   <Form.Control
                     name="address2"
                     className="mt-2"
-                    placeholder="Apartment, suite, unit, etc. (optional)"
+                    placeholder="Apartment, suite, etc. (optional)"
                     value={billing.address2}
                     onChange={handleChange}
                   />
@@ -171,7 +173,7 @@ const BillPage = ({ show, onClose }) => {
                 <Row>
                   <Col style={{ height: 'auto' }}>
                     <Form.Group className="mb-3">
-                      <Form.Label>Town / City *</Form.Label>
+                      <Form.Label>City *</Form.Label>
                       <Form.Control
                         name="city"
                         value={billing.city}
@@ -221,7 +223,7 @@ const BillPage = ({ show, onClose }) => {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>Email Address *</Form.Label>
+                  <Form.Label>Email *</Form.Label>
                   <Form.Control
                     name="email"
                     type="email"
@@ -232,7 +234,7 @@ const BillPage = ({ show, onClose }) => {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>Order Notes (optional)</Form.Label>
+                  <Form.Label>Order Notes</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={2}
@@ -247,16 +249,9 @@ const BillPage = ({ show, onClose }) => {
                 <h5>Your Order</h5>
                 <div className="border p-3 rounded">
                   {cartItems.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="d-flex justify-content-between mb-2"
-                    >
-                      <span>
-                        {item.title} × {item.quantity || 1}
-                      </span>
-                      <span>
-                        ₹{(item.price * (item.quantity || 1)).toFixed(2)}
-                      </span>
+                    <div key={idx} className="d-flex justify-content-between mb-2">
+                      <span>{item.title} × {item.quantity || 1}</span>
+                      <span>₹{(item.price * (item.quantity || 1)).toFixed(2)}</span>
                     </div>
                   ))}
 
@@ -266,17 +261,13 @@ const BillPage = ({ show, onClose }) => {
                     <span>₹{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="d-flex justify-content-between">
-                    <strong>TOTAL</strong>
-                    <span className="text-success fw-bold">
-                      ₹{subtotal.toFixed(2)}
-                    </span>
+                    <strong>Total</strong>
+                    <span className="text-success fw-bold">₹{subtotal.toFixed(2)}</span>
                   </div>
                   <hr />
                   <div className="mb-3">
                     <strong>Cash on Delivery</strong>
-                    <p className="text-muted mb-0">
-                      Pay with cash upon delivery.
-                    </p>
+                    <p className="text-muted mb-0">Pay with cash upon delivery.</p>
                   </div>
 
                   <Form.Check
@@ -287,11 +278,7 @@ const BillPage = ({ show, onClose }) => {
                     onChange={handleChange}
                   />
 
-                  <Button
-                    type="submit"
-                    variant="danger"
-                    className="w-100 mt-3"
-                  >
+                  <Button type="submit" variant="danger" className="w-100 mt-3">
                     PLACE ORDER
                   </Button>
                 </div>
@@ -301,21 +288,19 @@ const BillPage = ({ show, onClose }) => {
         </Modal.Body>
       </Modal>
 
-      {/* Toast for order success */}
-      <ToastContainer position="bottom-end" className="p-3">
+      {/* Success Toast */}
+      <ToastContainer position="top-center" className="p-3">
         <Toast
           bg="success"
           onClose={() => setShowToast(false)}
           show={showToast}
-          delay={4000}
+          delay={3000}
           autohide
         >
           <Toast.Header>
-            <strong className="me-auto">Order Status</strong>
+            <strong className="me-auto">Success</strong>
           </Toast.Header>
-          <Toast.Body className="text-white">
-            {success}
-          </Toast.Body>
+          <Toast.Body className="text-white">{successMsg}</Toast.Body>
         </Toast>
       </ToastContainer>
     </>

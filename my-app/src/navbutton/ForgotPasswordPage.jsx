@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
@@ -51,6 +52,7 @@ const ForgotPasswordPage = () => {
         />
 
         <button type="submit" style={styles.button}>Reset Password</button>
+        <p>Go to <Link to="/signin">Sign in</Link></p>
       </form>
     </div>
   );
@@ -58,7 +60,7 @@ const ForgotPasswordPage = () => {
 
 const styles = {
   container: {
-    minHeight: "100vh",
+    minHeight: "85vh",
     background: "linear-gradient(180deg, #eb4dc9, #af55d9)",
     display: "flex",
     justifyContent: "center",

@@ -20,15 +20,15 @@ import Saftware from "./coursepage/SoftwareTestingCourse";
 import Datascience from "./coursepage/DataScienceCourse";
 import Uiux from "./coursepage/UiuxCourse";
 import Digital from "./coursepage/DigitalMarketingCourse";
-
-
 //Teacher Page
 import FullStackTeachers from "./teacherpage/FullStackTeachers";
 import UiuxTeacherProfiles from "./teacherpage/UiuxTeacherProfiles";
 //Cart
 import CartSummary from "./cartpages/CartSummary";
 import ViewPage from "./cartpages/ViewPage";
-
+import Bill from "./cartpages/BillPage";
+//Admin
+import AdminLoginPage  from "./my-admin/AdminLogin";
 
 
 function App() {
@@ -37,10 +37,7 @@ function App() {
     <Router>
       <NavigationBar />
       <Routes>
-        <Route
-        path="/"  
-          element={
-            <>
+        <Route path="/"  element={  <>
               <LandingPage />
               {/* <Slider /> */}
               <Search />
@@ -68,7 +65,11 @@ function App() {
 
         <Route path="/card" element={<CartSummary />} />
         <Route path="/view" element={<ViewPage />}/>
+        <Route path="/bill" element={<Bill />}/>
+
+        <Route path="/adminlogin" element={<AdminLoginPage />} />
       </Routes>
+      
     </Router>
   );
 }

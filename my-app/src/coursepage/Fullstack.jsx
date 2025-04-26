@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { useCart } from '../cartpages/CartContext';
 import 'react-toastify/dist/ReactToastify.css';
 import fullstackImage from '../images/fullstack.jpg';
 import '../assets/CourseStyles.css';
 
-const levelPrices = {
-  Beginner: 5999,
-  Intermediate: 7999,
-  Advanced: 9999,
+export const levelPrices = {
+  Beginner: 4999,
+  Intermediate: 5999,
+  Advanced: 6999,
 };
 
 const FullStackCourse = () => {
   const [selectedLevels, setSelectedLevels] = useState([]);
   const { addToCart } = useCart();
+  const navigate = useNavigate(); // 👈 for redirecting to cart
 
   const handleCheckboxChange = (level) => {
     setSelectedLevels((prev) =>
@@ -36,18 +37,25 @@ const FullStackCourse = () => {
           price: levelPrices[level],
         });
       });
-      toast.success(
-        `🛒 Added to cart: ${selectedLevels.join(', ')} level(s)`
-      );
+      toast.success(`🛒 Added to cart: ${selectedLevels.join(', ')} level(s)`);
     }
   };
 
   const handleEnroll = () => {
-    if (selectedLevels.length === 0) {
-      toast.error('⚠️ Please select at least one level before enrolling');
-    } else {
-      toast.success(`✅ Enrolling in: ${selectedLevels.join(', ')}`);
-    }
+    const allLevels = Object.keys(levelPrices);
+
+    allLevels.forEach((level) => {
+      addToCart({
+        title: 'Full Stack Development',
+        level: level,
+        price: levelPrices[level],
+      });
+    });
+
+    toast.success('✅ Enrolled in Full Stack Development (All Levels)');
+
+    // 👇 Redirect to cart page
+    navigate('/card');
   };
 
   return (
@@ -106,11 +114,9 @@ const FullStackCourse = () => {
               <Button variant="success" onClick={handleAddToCart}>
                 Add to Cart
               </Button>
-              <Link to="/signin">
-                <Button variant="primary" onClick={handleEnroll}>
-                  Enroll Now
-                </Button>
-              </Link>
+              <Button variant="primary" onClick={handleEnroll}>
+                Enroll Now
+              </Button>
             </div>
           </Card>
         </Col>

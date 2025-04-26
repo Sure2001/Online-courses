@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import digitalImage from '../images/Digital-Marketing.jpg';
-import '../assets/CourseStyles.css';
-import { useCart } from '../cartpages/CartContext';
+import React, { useState } from "react";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import digitalImage from "../images/Digital-Marketing.jpg";
+import "../assets/CourseStyles.css";
+import { useCart } from "../cartpages/CartContext";
 
 export const levelPrices = {
   Beginner: 4999,
@@ -16,6 +16,7 @@ export const levelPrices = {
 const DigitalMarketingCourse = () => {
   const [selectedLevels, setSelectedLevels] = useState([]);
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handleCheckboxChange = (level) => {
     setSelectedLevels((prev) =>
@@ -25,25 +26,34 @@ const DigitalMarketingCourse = () => {
 
   const handleAddToCart = () => {
     if (selectedLevels.length === 0) {
-      toast.error('⚠️ Please select at least one level before adding to cart');
+      toast.error("⚠️ Please select at least one level before adding to cart");
     } else {
       selectedLevels.forEach((level) => {
         addToCart({
-          title: 'Digital Marketing',
+          title: "Digital Marketing",
           level: level,
           price: levelPrices[level],
         });
       });
-      toast.success('🛒 Course(s) added to cart successfully!');
+      toast.success("🛒 Course(s) added to cart successfully!");
     }
   };
 
   const handleEnroll = () => {
-    if (selectedLevels.length === 0) {
-      toast.error('⚠️ Please select at least one level before enrolling');
-    } else {
-      toast.success(`✅ Enrolling for: ${selectedLevels.join(', ')}`);
-    }
+    const allLevels = Object.keys(levelPrices);
+
+    allLevels.forEach((level) => {
+      addToCart({
+        title: "Digital Marketing",
+        level: level,
+        price: levelPrices[level],
+      });
+    });
+
+    toast.success("✅ Enrolled in Digital Marketing (All Levels)");
+
+    // 👇 Redirect to cart page
+    navigate("/card");
   };
 
   return (
@@ -61,8 +71,9 @@ const DigitalMarketingCourse = () => {
           <Card className="p-4 shadow">
             <h4>Course Overview</h4>
             <p>
-              Become a digital marketing expert by mastering SEO, social media strategy, content marketing,
-              PPC campaigns, and email marketing with real-time tools and analytics.
+              Become a digital marketing expert by mastering SEO, social media
+              strategy, content marketing, PPC campaigns, and email marketing
+              with real-time tools and analytics.
             </p>
 
             <h5>Syllabus Highlights:</h5>
@@ -83,35 +94,29 @@ const DigitalMarketingCourse = () => {
 
             <h5>Course Levels & Fees:</h5>
             <Form>
-              <Form.Check
-                type="checkbox"
-                label="Beginner - ₹4,999 (SEO + Basics)"
-                checked={selectedLevels.includes('Beginner')}
-                onChange={() => handleCheckboxChange('Beginner')}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Intermediate - ₹6,999 (Ads + Social Media)"
-                checked={selectedLevels.includes('Intermediate')}
-                onChange={() => handleCheckboxChange('Intermediate')}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Advanced - ₹9,499 (Full Campaign Strategy)"
-                checked={selectedLevels.includes('Advanced')}
-                onChange={() => handleCheckboxChange('Advanced')}
-              />
+              {Object.entries(levelPrices).map(([level, price]) => (
+                <Form.Check
+                  key={level}
+                  type="checkbox"
+                  label={`${level} - ₹${price.toLocaleString()} ${
+                    level === "Beginner"
+                      ? "(Basics + React)"
+                      : level === "Intermediate"
+                      ? "(Node.js + MongoDB)"
+                      : "(Full Stack + Deployment)"
+                  }`}
+                  checked={selectedLevels.includes(level)}
+                  onChange={() => handleCheckboxChange(level)}
+                />
+              ))}
             </Form>
-
             <div className="d-flex justify-content-center gap-3 mt-4">
-              <Button variant="outline-primary" onClick={handleAddToCart}>
+              <Button variant="success" onClick={handleAddToCart}>
                 Add to Cart
               </Button>
-              <Link to="/signin">
-                <Button variant="primary" onClick={handleEnroll}>
-                  Enroll Now
-                </Button>
-              </Link>
+              <Button variant="primary" onClick={handleEnroll}>
+                Enroll Now
+              </Button>
             </div>
           </Card>
         </Col>

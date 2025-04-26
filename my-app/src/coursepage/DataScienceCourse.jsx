@@ -1,25 +1,31 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import dataScienceImage from '../images/datascience.jpg';
 import '../assets/CourseStyles.css';
 import { useCart } from '../cartpages/CartContext';
 
- const levelPrices = {
-  Beginner: 4999,
-  Intermediate: 7499,
+
+
+
+export const levelPrices = {
+  Beginner: 5999,
+  Intermediate: 7999,
   Advanced: 9999,
 };
 
 const DataScienceCourse = () => {
   const [selectedLevels, setSelectedLevels] = useState([]);
   const { addToCart } = useCart();
+  const navigate = useNavigate(); // 👈 for redirecting to cart
 
   const handleCheckboxChange = (level) => {
     setSelectedLevels((prev) =>
-      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
+      prev.includes(level)
+        ? prev.filter((l) => l !== level)
+        : [...prev, level]
     );
   };
 
@@ -34,16 +40,22 @@ const DataScienceCourse = () => {
           price: levelPrices[level],
         });
       });
-      toast.success(`🛒 Added: Data Science (${selectedLevels.join(', ')}) to cart`);
+      toast.success(`🛒 Added to cart: Data Science (${selectedLevels.join(', ')}) level(s)`);
     }
   };
 
   const handleEnroll = () => {
-    if (selectedLevels.length === 0) {
-      toast.error('⚠️ Please select at least one level before enrolling');
-    } else {
-      toast.success(`✅ Enrolling for: ${selectedLevels.join(', ')}`);
-    }
+    const allLevels = Object.keys(levelPrices);
+    allLevels.forEach((level) => {
+      addToCart({
+        title: 'Data Science',
+        level: level,
+        price: levelPrices[level],
+      });
+    });
+    toast.success(`✅ Enrolled in Data Science (All Levels)`);
+    // 👇 Redirect to cart page
+    navigate('/card');
   };
 
   return (
@@ -77,47 +89,32 @@ const DataScienceCourse = () => {
               <li>Movie Recommendation System</li>
             </ul>
 
-            <h5>
-              Course Levels & Fees:
-            </h5>
-            <Form>
-              <Form.Check
-                type="checkbox"
-                label="Beginner - ₹4,999 (Python + Basic Analytics)"
-                checked={selectedLevels.includes('Beginner')}
-                onChange={() => handleCheckboxChange('Beginner')}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Intermediate - ₹7,499 (ML Basics + Projects)"
-                checked={selectedLevels.includes('Intermediate')}
-                onChange={() => handleCheckboxChange('Intermediate')}
-              />
-              <Form.Check
-                type="checkbox"
-                label="Advanced - ₹9,999 (ML + Deep Learning)"
-                checked={selectedLevels.includes('Advanced')}
-                onChange={() => handleCheckboxChange('Advanced')}
-              />
+            <h5>Course Levels & Fees:</h5>
+              <Form>
+              {Object.entries(levelPrices).map(([level, price]) => (
+                <Form.Check
+                  key={level}
+                  type="checkbox"
+                  label={`${level} - ₹${price.toLocaleString()} ${
+                    level === 'Beginner'
+                      ? '(Basics + React)'
+                      : level === 'Intermediate'
+                      ? '(Node.js + MongoDB)'
+                      : '(Full Stack + Deployment)'
+                  }`}
+                  checked={selectedLevels.includes(level)}
+                  onChange={() => handleCheckboxChange(level)}
+                />
+              ))}
             </Form>
 
             <div className="d-flex justify-content-center gap-3 mt-4">
-              <Button
-                variant="outline-primary"
-                onClick={handleAddToCart}
-                disabled={selectedLevels.length === 0}
-              >
+              <Button variant="success" onClick={handleAddToCart}>
                 Add to Cart
               </Button>
-              <Link to="/signin">
-                <Button
-                  variant="primary"
-                  onClick={handleEnroll}
-                  disabled={selectedLevels.length === 0}
-                >
-                  Enroll Now
-                </Button>
-              </Link>
+              <Button variant="primary" onClick={handleEnroll}>
+                Enroll Now
+              </Button>
             </div>
           </Card>
         </Col>
