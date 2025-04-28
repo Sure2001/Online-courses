@@ -29,7 +29,7 @@ import ViewPage from "./cartpages/ViewPage";
 import Bill from "./cartpages/BillPage";
 // Admin
 import AdminLoginPage  from "./my-admin/AdminLogin";
-import Dashboard from "./my-admin/Dashboard";
+import Adminnav from "./my-admin/AdminNavbar";
 
 function App() {
   return (
@@ -43,9 +43,11 @@ function AppRoutes() {
   const location = useLocation();
 
   // List of routes where Navbar and Footer should not be shown
-  const noNavbarFooterRoutes = ['/adminlogin', '/dashboard'];
+  const noNavbarFooterRoutes = ['/adminlogin', '/adminnavbar'];
+  const noFooterRoutes=['/card', '/signin', '/signup', '/forgot-password'];
 
-  const showNavbarFooter = !noNavbarFooterRoutes.includes(location.pathname);
+  const showNavbarFooter = !noNavbarFooterRoutes.includes(location.pathname) ;
+  const showFooter = !noFooterRoutes.includes(location.pathname);
 
   return (
     <>
@@ -82,9 +84,9 @@ function AppRoutes() {
         <Route path="/bill" element={<Bill />}/>
 
         <Route path="/adminlogin" element={<AdminLoginPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/adminnavbar" element={<Adminnav />} />
       </Routes>
-      {showNavbarFooter && <Footer />}
+      {showNavbarFooter && showFooter && <Footer />}
     </>
   );
 }

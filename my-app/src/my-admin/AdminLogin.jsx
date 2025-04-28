@@ -11,8 +11,8 @@ const AdminLogin = () => {
   const navigate = useNavigate();
 
   const demoAdmins = [
-    { email: 'admin@example.com', password: 'admin123', route: '/dashboard' },
-    { email: 'demo@admin.com', password: 'demo123', route: '/dashboard' },
+    { email: 'admin@example.com', password: 'admin123', route: '/adminnavbar' },
+    { email: 'demo@admin.com', password: 'demo123', route: '/adminnavbar' },
   ];
 
   const handleLogin = (e) => {
