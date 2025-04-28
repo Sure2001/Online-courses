@@ -30,6 +30,7 @@ import Bill from "./cartpages/BillPage";
 // Admin
 import AdminLoginPage  from "./my-admin/AdminLogin";
 import Adminnav from "./my-admin/AdminNavbar";
+import Dashboard from "./my-admin/Dashboard";
 
 function App() {
   return (
@@ -43,7 +44,7 @@ function AppRoutes() {
   const location = useLocation();
 
   // List of routes where Navbar and Footer should not be shown
-  const noNavbarFooterRoutes = ['/adminlogin', '/adminnavbar'];
+  const noNavbarFooterRoutes = ['/adminlogin', '/adminnavbar', '/dashboard'];''
   const noFooterRoutes=['/card', '/signin', '/signup', '/forgot-password'];
 
   const showNavbarFooter = !noNavbarFooterRoutes.includes(location.pathname) ;
@@ -85,6 +86,7 @@ function AppRoutes() {
 
         <Route path="/adminlogin" element={<AdminLoginPage />} />
         <Route path="/adminnavbar" element={<Adminnav />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
       {showNavbarFooter && showFooter && <Footer />}
     </>

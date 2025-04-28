@@ -57,7 +57,7 @@ const MobileAppCourse = () => {
     toast.success("✅ Enrolled in Mobile App Development (All Levels)");
 
     // 👇 Redirect to cart page
-    navigate("/card");
+   // navigate("/card");
   };
 
   return (
@@ -126,13 +126,17 @@ const MobileAppCourse = () => {
         </Col>
       </Row>
 
-      <ToastContainer
-        position="top-end"
-        autoClose={5000}
+        <ToastContainer
+        position="top-right" // ✅ changed from top-center to top-right
+        autoClose={3000}
         hideProgressBar={false}
         pauseOnHover
         draggable
         closeOnClick
+        toastStyle={{
+          backgroundColor: '#2e2e2e', // ✅ light black background
+          color: '#007bff', // ✅ blue text
+        }}
       />
     </Container>
   );

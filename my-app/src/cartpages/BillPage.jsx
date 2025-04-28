@@ -294,7 +294,7 @@ const BillPage = ({ show, onClose }) => {
           bg="success"
           onClose={() => setShowToast(false)}
           show={showToast}
-          delay={3000}
+          delay={1500}
           autohide
         >
           <Toast.Header>

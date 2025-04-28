@@ -55,7 +55,7 @@ const FullStackCourse = () => {
     toast.success('✅ Enrolled in Full Stack Development (All Levels)');
 
     // 👇 Redirect to cart page
-    navigate('/card');
+    // navigate('/card');
   };
 
   return (
@@ -123,13 +123,17 @@ const FullStackCourse = () => {
       </Row>
 
       <ToastContainer
-        position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        pauseOnHover
-        draggable
-        closeOnClick
-      />
+  position="top-right" // ✅ changed from top-center to top-right
+  autoClose={3000}
+  hideProgressBar={false}
+  pauseOnHover
+  draggable
+  closeOnClick
+  toastStyle={{
+    backgroundColor: '#2e2e2e', // ✅ light black background
+    color: '#007bff', // ✅ blue text
+  }}
+/>
     </Container>
   );
 };

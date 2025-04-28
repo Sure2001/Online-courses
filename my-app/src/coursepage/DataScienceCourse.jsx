@@ -55,7 +55,7 @@ const DataScienceCourse = () => {
     });
     toast.success(`✅ Enrolled in Data Science (All Levels)`);
     // 👇 Redirect to cart page
-    navigate('/card');
+    // navigate('/card');
   };
 
   return (
@@ -120,14 +120,18 @@ const DataScienceCourse = () => {
         </Col>
       </Row>
 
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        pauseOnHover
-        draggable
-        closeOnClick
-      />
+       <ToastContainer
+       position="top-right" // ✅ changed from top-center to top-right
+       autoClose={3000}
+       hideProgressBar={false}
+       pauseOnHover
+       draggable
+       closeOnClick
+       toastStyle={{
+         backgroundColor: '#2e2e2e', // ✅ light black background
+         color: '#007bff', // ✅ blue text
+       }}
+     />
     </Container>
   );
 };

@@ -1,19 +1,16 @@
 import { Navbar, Nav, NavDropdown, Container, Button, Image } from 'react-bootstrap';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useNavigate, Link } from 'react-router-dom'; // ✅ Import Link here
 import A from "../images/avatar-01.jpg";
 
 export default function Layout() {
   const [expanded, setExpanded] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();  // Initialize navigate
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Add your logout logic here
     console.log('User logged out');
-
-    // Redirect to the admin login page after logout
-    navigate('/adminlogin');  // Replace '/adminlogin' with your actual login page route
+    navigate('/adminlogin');
   };
 
   return (
@@ -26,7 +23,7 @@ export default function Layout() {
         >
           <h5 className="mb-2 fs-50">NAVIGATION</h5>
           <Nav className="flex-column">
-            <Nav.Link href="#dashboard" className="text-white custom-nav-link">Dashboard</Nav.Link>
+            <Link to="/dashboard" className="text-white custom-nav-link">Dashboard</Link>
             <NavDropdown title="Catalog" id="catalog-dropdown" className="custom-nav-dropdown">
               <NavDropdown.Item href="#courses" className="custom-dropdown-item">Courses</NavDropdown.Item>
               <NavDropdown.Item href="#categories" className="custom-dropdown-item">Categories</NavDropdown.Item>
@@ -85,9 +82,8 @@ export default function Layout() {
         </div>
       </div>
 
-      {/* Custom CSS inside a <style> tag */}
-      <style jsx>{`
-        /* Side Navbar Dropdown Title */
+      {/* ✅ Fixed inline styles */}
+      <style>{`
         .custom-nav-dropdown > a,
         .custom-nav-dropdown > .dropdown-toggle {
           color: white !important;
@@ -96,10 +92,9 @@ export default function Layout() {
         .custom-nav-dropdown > a:hover,
         .custom-nav-dropdown > .dropdown-toggle:hover,
         .custom-nav-dropdown.show > .dropdown-toggle {
-          color: #0d6efd !important; /* Blue on hover */
+          color: #0d6efd !important;
         }
 
-        /* Dropdown Items */
         .custom-dropdown-item {
           background-color: transparent;
           color: black !important;
