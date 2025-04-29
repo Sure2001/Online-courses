@@ -29,8 +29,12 @@ import ViewPage from "./cartpages/ViewPage";
 import Bill from "./cartpages/BillPage";
 // Admin
 import AdminLoginPage  from "./my-admin/AdminLogin";
-import Adminnav from "./my-admin/AdminNavbar";
-import Dashboard from "./my-admin/Dashboard";
+// import Adminnav from "./my-admin/AdminNavbar";
+// import Dashboard from "./my-admin/Dashboard";
+import AdminLayout from "./my-admin/layout/AdminLayout"
+import Dashboard from "./my-admin/pages/Dashboard";
+import User from "./my-admin/pages/User";
+import Order from "./my-admin/pages/Order";
 
 function App() {
   return (
@@ -44,11 +48,12 @@ function AppRoutes() {
   const location = useLocation();
 
   // List of routes where Navbar and Footer should not be shown
-  const noNavbarFooterRoutes = ['/adminlogin', '/adminnavbar', '/dashboard'];''
-  const noFooterRoutes=['/card', '/signin', '/signup', '/forgot-password'];
-
-  const showNavbarFooter = !noNavbarFooterRoutes.includes(location.pathname) ;
+  const noNavbarFooterRoutes = ['/adminlogin', '/admin', '/admin/dashboard', '/admin/user' ,'/admin/order'];
+  const noFooterRoutes = ['/card', '/signin', '/signup', '/forgot-password'];
+  
+  const showNavbarFooter = !noNavbarFooterRoutes.includes(location.pathname);
   const showFooter = !noFooterRoutes.includes(location.pathname);
+  
 
   return (
     <>
@@ -85,8 +90,12 @@ function AppRoutes() {
         <Route path="/bill" element={<Bill />}/>
 
         <Route path="/adminlogin" element={<AdminLoginPage />} />
-        <Route path="/adminnavbar" element={<Adminnav />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<Dashboard />} /> 
+          <Route path="user" element={<User />} />
+          <Route path="order" element={<Order />} />
+        </Route>
+
       </Routes>
       {showNavbarFooter && showFooter && <Footer />}
     </>

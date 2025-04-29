@@ -126,15 +126,41 @@ app.post('/api/forgot-password', async (req, res) => {
   }
 });
 
-// ── Create Order ───────────────────────────────────────────
-app.post('/api/orders', async (req, res) => {
+// ── Get All Orders with Pagination & Search ─────────────────────────
+app.get('/api/orders', async (req, res) => {
+  const { page = 1, limit = 10, search = '' } = req.query;
+
   try {
-    const order = new Order(req.body);
-    await order.save();
-    res.json({ message: 'Order placed successfully!', orderId: order._id });
+    const query = search
+      ? { 'billing.email': { $regex: search, $options: 'i' } }
+      : {};
+
+    const total = await Order.countDocuments(query);
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    res.json({
+      orders,
+      totalPages: Math.ceil(total / limit),
+      currentPage: parseInt(page),
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error placing order' });
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
+
+
+app.delete('/api/orders/:id', async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    console.error('Delete order error:', err);
+    res.status(500).json({ message: 'Failed to delete order' });
   }
 });
 
@@ -152,6 +178,31 @@ app.get('/api/user-image/:email', async (req, res) => {
     res.status(500).json({ message: "Error retrieving image" });
   }
 });
+
+
+// ── Get All Users ───────────────────────────────────────────────
+app.get('/api/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Error fetching users' });
+  }
+});
+
+// ── Delete User ───────────────────────────────────────────────
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Error deleting user' });
+  }
+});
+
 
 // ── Start Server ───────────────────────────────────────────
 app.listen(5000, () => {
