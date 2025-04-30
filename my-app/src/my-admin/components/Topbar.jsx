@@ -1,8 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // ✅ Import Link
 import { Dropdown } from "react-bootstrap";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import A from "../avatar-01.jpg";
-
 
 const Topbar = () => {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ const Topbar = () => {
             className="d-flex align-items-center border-0 bg-transparent"
           >
             <img
-              src={A} // Replace with real image URL or avatar logic
+              src={A}
               alt="Admin Avatar"
               className="rounded-circle me-2"
               width="40"
@@ -36,7 +35,10 @@ const Topbar = () => {
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Dropdown.Item href="/admin/profile">Profile</Dropdown.Item>
+            {/* ✅ Use Link for SPA routing */}
+            <Dropdown.Item as={Link} to="/adminprofile">
+              Profile
+            </Dropdown.Item>
             <Dropdown.Item href="/">My Course</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={handleLogout} className="text-danger">

@@ -13,9 +13,11 @@ const Dashboard = () => {
       </div>
 
       {/* Top Cards */}
-      <Row className="mb-4">
+     {/* Dashboard Metrics Cards - values like "Total Orders" should be dynamically fetched from backend */}
+<Row className="mb-4">
   {[
-    { title: "Total Orders", value: 3, icon: "🛒" },
+    // Replace the hardcoded `3` below with dynamic order count (e.g., orders.length)
+    { title: "Total Orders", value: 3, icon: "🛒" }, // 🔗 Linked to Order.jsx fetched data
     { title: "Total Sales", value: 515, icon: "💳" },
     { title: "Total Customers", value: 2, icon: "👤" },
     { title: "People Online", value: 0, icon: "👥" },
@@ -36,9 +38,9 @@ const Dashboard = () => {
         </Card.Header>
         <Card.Body className="d-flex justify-content-between align-items-center">
           <div>
-            <div style={{ fontSize: '2rem', opacity: 0.5 }}>{card.icon}</div>
+            <div style={{ fontSize: '3rem', opacity: 1 }}>{card.icon}</div>
           </div>
-          <h3 className="m-0">{card.value}</h3>
+          <h1 className="m-0">{card.value}</h1>
         </Card.Body>
         <Card.Footer
           style={{
@@ -54,6 +56,7 @@ const Dashboard = () => {
     </Col>
   ))}
 </Row>
+
 
 
       {/* Map and Sales Analytics */}

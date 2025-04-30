@@ -135,16 +135,20 @@ app.get('/api/orders', async (req, res) => {
       ? { 'billing.email': { $regex: search, $options: 'i' } }
       : {};
 
+    // Fetch the total number of orders based on the query
     const total = await Order.countDocuments(query);
-    const orders = await Order.find(query)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(parseInt(limit));
 
+    // Fetch the orders, sorted by creation date in descending order, with pagination and limit
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })  // Sorting by createdAt in descending order
+      .skip((page - 1) * limit)  // Skipping the records based on the current page
+      .limit(parseInt(limit));   // Limiting the number of records per page
+
+    // Sending the response with the orders, total pages, and current page
     res.json({
       orders,
-      totalPages: Math.ceil(total / limit),
-      currentPage: parseInt(page),
+      totalPages: Math.ceil(total / limit),  // Calculating the total number of pages
+      currentPage: parseInt(page),          // Sending the current page number
     });
   } catch (err) {
     console.error('Error fetching orders:', err);
@@ -152,17 +156,20 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
-
 app.delete('/api/orders/:id', async (req, res) => {
   try {
+    // Attempt to find and delete the order by ID
     const order = await Order.findByIdAndDelete(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // If order is deleted, send success message
     res.json({ message: 'Order deleted successfully' });
   } catch (err) {
     console.error('Delete order error:', err);
     res.status(500).json({ message: 'Failed to delete order' });
   }
 });
+
 
 // ── Optional: Get user image ───────────────────────────────
 app.get('/api/user-image/:email', async (req, res) => {
@@ -200,6 +207,36 @@ app.delete('/api/users/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting user:', error);
     res.status(500).json({ message: 'Error deleting user' });
+  }
+});
+
+
+// GET /api/admin/profile
+app.get("/api/admin/profile", async (req, res) => {
+  try {
+    // Assuming the admin's data is stored in the `User` model and the user is authenticated
+    const admin = await User.findById(req.user.id); // `req.user.id` is from JWT or session
+    res.json(admin);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch admin profile" });
+  }
+});
+
+// PUT /api/admin/profile
+app.put("/api/admin/profile", upload.single("profilePicture"), async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+    const profilePicture = req.file ? req.file.path : null;
+
+    const updatedAdmin = await User.findByIdAndUpdate(
+      req.user.id,
+      { name, email, phone, profilePicture },
+      { new: true }
+    );
+
+    res.json(updatedAdmin);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update profile" });
   }
 });
 
