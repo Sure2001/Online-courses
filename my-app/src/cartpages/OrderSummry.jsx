@@ -6,7 +6,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 
 const OrderSummaryPage = () => {
-  const { cartItems, clearCart } = useCart(); 
+  const { cartItems, clearCart, isReturningCustomer } = useCart(); 
   const navigate = useNavigate();
 
   const subtotal = cartItems.reduce(
@@ -18,15 +18,15 @@ const OrderSummaryPage = () => {
 
   const handleConfirmOrder = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
-
+  
     if (!user?.email || !user?.username) {
       alert('Please register or log in to place an order.');
       navigate('/login');
       return;
     }
-    
-    const userType = localStorage.getItem("isNewCustomer") === "true" ? "New Customer" : "Returning Customer";
-    
+
+    const userType = isReturningCustomer ? "Returning Customer" : "New Customer";
+
     const orderData = {
       userEmail: user.email,
       userName: user.username,
@@ -40,8 +40,7 @@ const OrderSummaryPage = () => {
       subtotal,
       total,
     };
-    
-
+  
     try {
       const response = await fetch('http://localhost:5000/api/orders/create', {
         method: 'POST',
@@ -50,18 +49,17 @@ const OrderSummaryPage = () => {
         },
         body: JSON.stringify(orderData),
       });
-
+  
       const result = await response.json();
       if (response.ok) {
         clearCart();  // Clear the cart after confirming the order
-
+  
         // Show success toast notification
         toast.success('Order placed successfully!', {
           position: "top-center", 
           autoClose: 2000, 
         });
-
-     
+  
         setTimeout(() => {
           navigate('/');  
         }, 5000); // Delay for 5 seconds (same as the toast duration)

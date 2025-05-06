@@ -30,7 +30,7 @@ import Bill from "./cartpages/BillPage";
 import LoginRegisterPage from "./cartpages/LoginRegisterPage";
 import RegisterPage from "./cartpages/RegisterPage";
 import OrderSummary from "./cartpages/OrderSummry";
-import OrderConfirmation from "./cartpages/ConfirmSummary";
+
 
 // Admin
 import AdminLoginPage  from "./my-admin/AdminLogin";
@@ -96,8 +96,6 @@ function AppRoutes() {
         <Route path="/login" element={<LoginRegisterPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/ordersummary" element={<OrderSummary />} />
-        <Route path="/confirmorder" element={<OrderConfirmation />} />
-       
 
         <Route path="/adminlogin" element={<AdminLoginPage />} />
         <Route path="/admin" element={<AdminLayout />}>

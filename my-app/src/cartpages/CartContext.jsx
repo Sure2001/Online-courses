@@ -1,35 +1,34 @@
+// CartContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// 1. Create the CartContext
+// Create the CartContext
 const CartContext = createContext();
 
-// 2. Export the provider component
+// Export the provider component
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
-  const [user, setUser] = useState(null);  // State to store user info
+  const [user, setUser] = useState(null);
 
-  // ✅ Load cart from localStorage on mount
+  // Load cart and user from localStorage on mount
   useEffect(() => {
     const storedCart = localStorage.getItem("cartItems");
     if (storedCart) {
       setCartItems(JSON.parse(storedCart));
     }
-  }, []);
 
-  // ✅ Load user from localStorage on mount
-  useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
   }, []);
 
-  // ✅ Save cart to localStorage whenever it changes
+  // Save cart and user to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    if (cartItems) {
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    }
   }, [cartItems]);
 
-  // ✅ Save user to localStorage whenever it changes
   useEffect(() => {
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
@@ -50,13 +49,16 @@ export const CartProvider = ({ children }) => {
 
   // Clear the cart
   const clearCart = () => {
-    setCartItems([]); // Clear the cart items
+    setCartItems([]);
   };
 
   // Set user data
   const setUserData = (userData) => {
-    setUser(userData);  // Save user data in state
+    setUser(userData);
   };
+
+  // Get customer type from localStorage
+  const isReturningCustomer = localStorage.getItem("isNewCustomer") === "false";
 
   return (
     <CartContext.Provider
@@ -65,9 +67,10 @@ export const CartProvider = ({ children }) => {
         setCartItems,
         addToCart,
         removeFromCart,
-        clearCart,    // Expose clearCart function
-        user,         // Expose user data
-        setUserData,  // Expose function to set user data
+        clearCart,
+        user,
+        setUserData,
+        isReturningCustomer,  // Expose isReturningCustomer flag
       }}
     >
       {children}
@@ -75,5 +78,5 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// 6. Custom hook to use the cart and user
+// Custom hook to use the cart and user
 export const useCart = () => useContext(CartContext);
