@@ -1,9 +1,9 @@
-import React from 'react';
-import { Button, Table, Container } from 'react-bootstrap';
-import { useCart } from './CartContext';
-import { FaTrash } from 'react-icons/fa';
-import fullstackImage from '../images/fullstack.jpg';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Button, Table, Container } from "react-bootstrap";
+import { useCart } from "./CartContext";
+import { FaTrash } from "react-icons/fa";
+import fullstackImage from "../images/fullstack.jpg";
+import { useNavigate } from "react-router-dom";
 
 const ViewPage = () => {
   const { cartItems, setCartItems } = useCart();
@@ -16,7 +16,10 @@ const ViewPage = () => {
 
   const updateQuantity = (index, delta) => {
     const updated = [...cartItems];
-    updated[index].quantity = Math.max(1, (updated[index].quantity || 1) + delta);
+    updated[index].quantity = Math.max(
+      1,
+      (updated[index].quantity || 1) + delta
+    );
     setCartItems(updated);
   };
 
@@ -55,25 +58,25 @@ const ViewPage = () => {
                     <img
                       src={item.image || fullstackImage}
                       alt={item.title}
-                      style={{ width: 50, height: 50, objectFit: 'cover' }}
+                      style={{ width: 50, height: 50, objectFit: "cover" }}
                     />
                   </td>
                   <td>{item.title}</td>
                   <td>{item.level}</td>
                   <td>₹{item.price.toFixed(2)}</td>
                   <td>
-                    <div className="d-flex align-items-center">
+                    <div className="d-flex align-items-center justify-content-center">
                       <Button
-                        size="sm"
-                        variant="outline-secondary"
+                       
+                        
+                        style={{ width: "auto",backgroundColor: "blue", border: "none", color: "#fff", fontWeight: "bold"}}
                         onClick={() => updateQuantity(index, -1)}
                       >
                         −
                       </Button>
                       <span className="mx-2">{item.quantity || 1}</span>
                       <Button
-                        size="sm"
-                        variant="outline-secondary"
+                        style={{ width: "auto",backgroundColor: "green", border: "none", color: "#fff", fontWeight: "bold"}}
                         onClick={() => updateQuantity(index, 1)}
                       >
                         +
@@ -95,17 +98,19 @@ const ViewPage = () => {
 
           <div className="text-end mt-3">
             <h5>
-              Subtotal: <span className="text-success">₹{subtotal.toFixed(2)}</span>
+              Subtotal:{" "}
+              <span className="text-success">₹{subtotal.toFixed(2)}</span>
             </h5>
             <Button
               style={{
                 flex: 1,
-                backgroundColor: 'green',
-                border: 'none',
-                color: '#fff',
-                fontWeight: 'bold',
+                backgroundColor: "green",
+                border: "none",
+                color: "#fff",
+                fontWeight: "bold",
+                width: "auto",
               }}
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
             >
               Checkout
             </Button>
@@ -113,7 +118,12 @@ const ViewPage = () => {
         </>
       )}
 
-      <Button variant="secondary" className="mt-4" onClick={() => navigate('/')}>
+      <Button
+        variant="secondary"
+        className="mt-4"
+        style={{ width: "auto" }}
+        onClick={() => navigate("/")}
+      >
         Continue Shopping
       </Button>
     </Container>

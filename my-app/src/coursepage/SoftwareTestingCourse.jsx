@@ -55,7 +55,7 @@ const SoftwareTestingCourse = () => {
       toast.success('✅ Enrolled in Software Testing (All Levels)');
   
       // 👇 Redirect to cart page
-      // navigate('/card');
+      navigate('/login');;
     };
 
   return (
@@ -112,14 +112,14 @@ const SoftwareTestingCourse = () => {
               ))}
             </Form>
 
-            <div className="d-flex justify-content-center gap-3 mt-4">
-              <Button variant="success" onClick={handleAddToCart}>
-                Add to Cart
-              </Button>
-              <Button variant="primary" onClick={handleEnroll}>
-                Enroll Now
-              </Button>
-            </div>
+           <div className="d-flex justify-content-end gap-3 mt-4">
+                         <Button style={{background:'green', width: '25%'}} onClick={handleAddToCart}>
+                           Add to Cart
+                         </Button>
+                         <Button style={{background:'blue', width: '25%'}} onClick={handleEnroll}>
+                           Enroll Now
+                         </Button>
+                       </div>
           </Card>
         </Col>
       </Row>
