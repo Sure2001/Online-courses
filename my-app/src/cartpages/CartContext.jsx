@@ -1,64 +1,56 @@
 // CartContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Create the CartContext
 const CartContext = createContext();
 
-// Export the provider component
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [user, setUser] = useState(null);
+  const [isReturningCustomer, setIsReturningCustomer] = useState(false);
 
-  // Load cart and user from localStorage on mount
+  // Load cart and user from localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem("cartItems");
-    if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
-    }
+    if (storedCart) setCartItems(JSON.parse(storedCart));
 
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (storedUser) setUser(JSON.parse(storedUser));
+
+    const newCustomerFlag = localStorage.getItem("isNewCustomer");
+    if (newCustomerFlag === "false") {
+      setIsReturningCustomer(true);
     }
   }, []);
 
-  // Save cart and user to localStorage whenever they change
+  // Save cartItems to localStorage
   useEffect(() => {
-    if (cartItems) {
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
-    }
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Save user to localStorage
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    }
+    if (user) localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
 
-  // Add item to cart
   const addToCart = (item) => {
     setCartItems((prev) => [...prev, { ...item, quantity: 1 }]);
   };
 
-  // Remove item from cart by index
   const removeFromCart = (index) => {
     const updated = [...cartItems];
     updated.splice(index, 1);
     setCartItems(updated);
   };
 
-  // Clear the cart
   const clearCart = () => {
     setCartItems([]);
   };
 
-  // Set user data
-  const setUserData = (userData) => {
+  const setUserData = (userData, isNew = true) => {
     setUser(userData);
+    localStorage.setItem("isNewCustomer", isNew ? "true" : "false");
+    setIsReturningCustomer(!isNew);
   };
-
-  // Get customer type from localStorage
-  const isReturningCustomer = localStorage.getItem("isNewCustomer") === "false";
 
   return (
     <CartContext.Provider
@@ -70,7 +62,7 @@ export const CartProvider = ({ children }) => {
         clearCart,
         user,
         setUserData,
-        isReturningCustomer,  // Expose isReturningCustomer flag
+        isReturningCustomer,
       }}
     >
       {children}
@@ -78,5 +70,4 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the cart and user
 export const useCart = () => useContext(CartContext);

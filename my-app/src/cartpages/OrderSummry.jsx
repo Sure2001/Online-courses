@@ -19,13 +19,14 @@ const OrderSummaryPage = () => {
   const handleConfirmOrder = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
   
-    if (!user?.email || !user?.username) {
+    if (!user?.email || !user?.password) {
       alert('Please register or log in to place an order.');
       navigate('/login');
       return;
     }
 
     const userType = isReturningCustomer ? "Returning Customer" : "New Customer";
+
 
     const orderData = {
       userEmail: user.email,

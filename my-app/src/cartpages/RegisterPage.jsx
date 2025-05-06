@@ -19,9 +19,8 @@ const RegisterPage = () => {
   const [errors, setErrors] = useState({});
   const [preview, setPreview] = useState(null);
   const navigate = useNavigate();
-  
-  // Get the setUserData function from context
-  const { setUserData } = useCart(); 
+
+  const { setUserData } = useCart(); // Get setUserData from context
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -61,7 +60,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-  
+
     const formData = new FormData();
     formData.append("username", form.username);
     formData.append("email", form.email);
@@ -71,24 +70,21 @@ const RegisterPage = () => {
     if (form.image) {
       formData.append("image", form.image);
     }
-  
+
     try {
       const res = await axios.post("http://localhost:5000/api/register", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-  
+
       toast.success(res.data.message || "Registered successfully!");
-  
-      // Save user data
+
       const userData = { username: form.username, email: form.email };
-      setUserData(userData);
-  
-      // ✅ Store in localStorage to identify user type
-      localStorage.setItem("isNewCustomer", "true");
-      localStorage.setItem("user", JSON.stringify(userData));
-  
+      
+      // ✅ Save user as NEW customer
+      setUserData(userData, true); // true = new customer
+
       setTimeout(() => {
         navigate("/ordersummary");
       }, 1000);
@@ -96,7 +92,6 @@ const RegisterPage = () => {
       toast.error(error.response?.data?.message || "Registration failed");
     }
   };
-  
 
   return (
     <form className="register-form" onSubmit={handleSubmit}>

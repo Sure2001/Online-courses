@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const LoginRegisterPage = () => {
   const navigate = useNavigate();
-  const { addToCart } = useCart(); // Access addToCart from context
+  const { addToCart, setUserData } = useCart(); // Access addToCart and setUserData from context
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,20 +19,23 @@ const LoginRegisterPage = () => {
       const res = await axios.post("http://localhost:5000/api/login", { email, password });
 
       if (res.data && res.data.user) {
-        // Store user data in localStorage
-        localStorage.setItem("user", JSON.stringify(res.data.user));
+        const user = res.data.user;
 
-        // Set 'isNewCustomer' to false for returning customers
+        // Set user as returning customer
+        setUserData(user, false); // false = returning customer
+
+        // Store in localStorage
+        localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("isNewCustomer", "false");
 
-        // Sync user's cart data if it exists
-        if (res.data.user.cart) {
-          res.data.user.cart.forEach(item => addToCart(item)); // Add items to the cart context
+        // Sync cart items if available
+        if (user.cart && Array.isArray(user.cart)) {
+          user.cart.forEach(item => addToCart(item));
         }
 
         toast.success("Login successful!");
 
-        // Redirect to order summary page after a delay
+        // Redirect to order summary after a delay
         setTimeout(() => {
           navigate("/ordersummary");
         }, 1000);
@@ -40,7 +43,6 @@ const LoginRegisterPage = () => {
         toast.error("Invalid login response.");
       }
     } catch (err) {
-      // Handle login errors
       toast.error(err.response?.data?.message || "Login failed!");
     }
   };
@@ -64,7 +66,6 @@ const LoginRegisterPage = () => {
           <h2>Returning Customer</h2>
           <p className="subheading">I am a returning customer</p>
 
-          {/* Email input */}
           <div className="input-group">
             <label>E-Mail Address</label>
             <input
@@ -75,7 +76,6 @@ const LoginRegisterPage = () => {
             />
           </div>
 
-          {/* Password input */}
           <div className="input-group">
             <label>Password</label>
             <input
@@ -88,12 +88,10 @@ const LoginRegisterPage = () => {
 
           <p className="forgot-password">Forgotten Password?</p>
 
-          {/* Login Button */}
           <button className="btn" onClick={handleLogin}>LOGIN</button>
         </div>
       </div>
 
-      {/* Toast Notification */}
       <ToastContainer position="top-center" />
     </div>
   );
