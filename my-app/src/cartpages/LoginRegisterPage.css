@@ -1,97 +1,132 @@
-/* LoginRegisterPage.css */
+/* Container styles */
+.auth-container {
+  max-width: 900px;
+  margin: 50px auto;
+  background: linear-gradient(180deg, #eb4dc9, #af55d9);
+  border-radius: 12px;
+  padding: 30px;
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  animation: fadeIn 0.6s ease-in-out;
+}
 
-.page-container {
-    min-height: 100vh;
-    background-color: #f7f7f7;
-    padding: 20px;
-    box-sizing: border-box;
+/* Header section */
+.option-header {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #f0f0f0;
+}
+
+/* Auth toggle options */
+.auth-options {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+.auth-options label {
+  cursor: pointer;
+  font-weight: bold;
+}
+.auth-options input {
+  margin-right: 6px;
+}
+
+/* Form box */
+.form-box {
+  background-color:white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.5s ease-in-out;
+}
+
+/* Grid layout for registration */
+.two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Input group styling */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+.input-group label {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color:black;
+}
+.input-group input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid #444;
+  background-color: white;
+  color:black;
+}
+.input-group input[type="file"] {
+  padding: 5px;
+}
+
+/* Error message */
+.error {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Button styles */
+.btn {
+  background: #4f46e5;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+  width: 100%;
+  margin-top: 15px;
+}
+.btn:hover {
+  background: #3f37c9;
+}
+
+/* Privacy checkbox */
+.privacy {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 14px;
+  color:black;
+}
+.privacy input {
+  margin-right: 8px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive behavior */
+@media (max-width: 600px) {
+  .auth-options {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
-  
-  .form-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: space-between;
-  }
-  
-  .form-box {
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    padding: 30px;
-    width: 100%;
-    max-width: 480px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .form-box h2 {
-    margin-top: 0;
-    font-size: 24px;
-    font-weight: 600;
-  }
-  
-  .form-box h3 {
-    margin-top: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #555;
-  }
-  
-  .form-box p {
-    color: #666;
-    margin-bottom: 20px;
-  }
-  
-  .input-group {
-    margin-bottom: 15px;
-  }
-  
-  .input-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
-    color: #333;
-  }
-  
-  .input-group input {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f0f0f0;
-  }
-  
-  .subheading {
-    font-weight: 600;
-    color: #555;
-    margin-top: 10px;
-  }
-  
-  .forgot-password {
-    color: #007bff;
-    font-size: 14px;
-    margin-top: 5px;
-    cursor: pointer;
-  }
-  
-  .forgot-password:hover {
-    text-decoration: underline;
-  }
-  
   .btn {
-    background-color: #777;
-    color: #fff;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    font-size: 14px;
   }
-  
-  .btn:hover {
-    background-color: #555;
-  }
-
-  
+}

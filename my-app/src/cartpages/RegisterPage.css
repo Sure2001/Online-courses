@@ -3,17 +3,19 @@
     margin: 50px auto 50px auto;
     padding: 30px;
     border: 1px solid #ddd;
-    background: #fff;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #eb4dc9, #af55d9);
     font-family: Arial, sans-serif;;
   }
   
   .register-form h2 {
     margin-bottom: 10px;
+    color: #fff;
   }
   
   .register-form p {
     font-size: 14px;
-    color: #666;
+    color: #fff;
   }
   
   .register-form fieldset {

@@ -26,10 +26,11 @@ import UiuxTeacherProfiles from "./teacherpage/UiuxTeacherProfiles";
 // Cart
 import CartSummary from "./cartpages/CartSummary";
 import ViewPage from "./cartpages/ViewPage";
-import Bill from "./cartpages/BillPage";
+
 import LoginRegisterPage from "./cartpages/LoginRegisterPage";
 import RegisterPage from "./cartpages/RegisterPage";
 import OrderSummary from "./cartpages/OrderSummry";
+import ConfirmPage from "./cartpages/ConfirmPage";
 
 
 // Admin
@@ -54,7 +55,7 @@ function AppRoutes() {
 
   // List of routes where Navbar and Footer should not be shown
   const noNavbarFooterRoutes = ['/adminlogin', '/admin', '/admin/dashboard', '/admin/user' ,'/admin/order' ,'/admin/adminprofile'];
-  const noFooterRoutes = ['/card', '/signin', '/signup', '/forgot-password'];
+  const noFooterRoutes = ['/card', '/signin', '/signup', '/forgot-password','/confirm'];
   
   const showNavbarFooter = !noNavbarFooterRoutes.includes(location.pathname);
   const showFooter = !noFooterRoutes.includes(location.pathname);
@@ -92,10 +93,11 @@ function AppRoutes() {
 
         <Route path="/card" element={<CartSummary />} />
         <Route path="/view-cart" element={<ViewPage />} />
-        <Route path="/bill" element={<Bill />}/>
+    
         <Route path="/login" element={<LoginRegisterPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/ordersummary" element={<OrderSummary />} />
+        <Route path="/confirm" element={<ConfirmPage />} />
 
         <Route path="/adminlogin" element={<AdminLoginPage />} />
         <Route path="/admin" element={<AdminLayout />}>

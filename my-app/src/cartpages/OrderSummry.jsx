@@ -19,7 +19,7 @@ const OrderSummaryPage = () => {
   const handleConfirmOrder = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
   
-    if (!user?.email || !user?.password) {
+    if (!user?.email) {
       alert('Please register or log in to place an order.');
       navigate('/login');
       return;
@@ -58,12 +58,12 @@ const OrderSummaryPage = () => {
         // Show success toast notification
         toast.success('Order placed successfully!', {
           position: "top-center", 
-          autoClose: 2000, 
+          autoClose: 1000, 
         });
   
         setTimeout(() => {
-          navigate('/');  
-        }, 5000); // Delay for 5 seconds (same as the toast duration)
+          navigate('/confirm');  
+        }, 1000); 
       } else {
         alert(result.message || 'Failed to place order.');
       }
