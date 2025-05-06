@@ -1,0 +1,97 @@
+/* LoginRegisterPage.css */
+
+.page-container {
+    min-height: 100vh;
+    background-color: #f7f7f7;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .form-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+  }
+  
+  .form-box {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    padding: 30px;
+    width: 100%;
+    max-width: 480px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-box h2 {
+    margin-top: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  
+  .form-box h3 {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+  }
+  
+  .form-box p {
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .input-group {
+    margin-bottom: 15px;
+  }
+  
+  .input-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+  }
+  
+  .subheading {
+    font-weight: 600;
+    color: #555;
+    margin-top: 10px;
+  }
+  
+  .forgot-password {
+    color: #007bff;
+    font-size: 14px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  
+  .forgot-password:hover {
+    text-decoration: underline;
+  }
+  
+  .btn {
+    background-color: #777;
+    color: #fff;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background-color: #555;
+  }
+
+  

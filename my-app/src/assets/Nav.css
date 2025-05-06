@@ -15,6 +15,19 @@
   font-weight: 500;
   font-size: 20px;
 }
+/* Override default Bootstrap dropdown item hover color */
+.navbar-nav .nav-item .nav-link:hover, 
+.navbar-nav .nav-dropdown .nav-dropdown-item:hover {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* You can customize the dropdown item hover color as well */
+.navbar-nav .nav-item .nav-link,
+.navbar-nav .nav-dropdown .nav-dropdown-item {
+  transition: background-color 0.2s ease-in-out; /* smooth transition */
+}
+
 .nav-button {
   width: 35%;
   text-align: end;
@@ -83,7 +96,12 @@
   box-shadow: 0 6px 16px rgba(184, 48, 233, 0.4);
 }
 .card-icon {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+}
+.cart,.nav-button{
+  font-size: 20px;
+  font-weight: 500;
+  justify-content: end;
 }
 .btn {
   display: inline-block;

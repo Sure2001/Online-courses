@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { Button, Table } from 'react-bootstrap';
+import { Button, Image } from 'react-bootstrap';
 import { useCart } from '../cartpages/CartContext';
 import { FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import fullstackImage from '../images/fullstack.jpg';
-import ViewPage from '../cartpages/ViewPage'; // ✅ View Cart Modal
-import BillPage from '../cartpages/BillPage'; // ✅ Billing Modal
 
 const CartSummary = () => {
   const { cartItems, setCartItems } = useCart();
-  const [showModal, setShowModal] = useState(false);   // View Cart
-  const [showBill, setShowBill] = useState(false);     // Billing Page
+  const navigate = useNavigate();
 
   const handleRemove = (index) => {
     const updated = [...cartItems];
@@ -23,67 +21,122 @@ const CartSummary = () => {
   );
 
   return (
-    <div className="p-3 cart-summary" style={{ alignItems: 'center' }}>
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Course Title</th>
-            <th>Level</th>
-            <th>Price</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cartItems.map((item, index) => (
-            <tr key={index}>
-              <td>
-                <img
-                  src={fullstackImage}
-                  alt={item.title}
-                  className="img-fluid rounded"
-                  style={{ width: '80px', height: '80px' }}
-                />
-              </td>
-              <td>{item.title}</td>
-              <td>{item.level}</td>
-              <td>₹{item.price.toFixed(2)}</td>
-              <td>
-                <FaTrash
-                  role="button"
-                  color="gray"
-                  onClick={() => handleRemove(index)}
-                />
-              </td>
-            </tr>
+    <div
+      style={{
+        width: '330px',
+        backgroundColor: 'white',
+        border: '1px solid #ddd',
+        borderRadius: '10px',
+        padding: '16px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        zIndex: 999,
+      }}
+    >
+      {cartItems.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#888' }}>
+          Your cart is empty
+        </p>
+      ) : (
+        <div
+          style={{
+            maxHeight: '300px',
+            overflowY: 'auto',
+            marginBottom: '16px',
+          }}
+        >
+          {[...cartItems].reverse().map((item, index) => (
+            <div
+              key={index}
+              style={{
+                display: 'flex',
+                alignItems: 'start',
+                marginBottom: '16px',
+                borderBottom: '1px solid #eee',
+                paddingBottom: '12px',
+                gap: '10px',
+                fontSize: '14px',
+              }}
+            >
+              <Image
+                src={item.image || fullstackImage}
+                alt={item.title}
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '6px',
+                  objectFit: 'cover',
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                  {item.title}
+                </div>
+                <div style={{ color: '#666' }}>{item.level}</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: '6px',
+                  }}
+                >
+                  <div>x {item.quantity || 1}</div>
+                  <div>₹{item.price.toFixed(2)}</div>
+                </div>
+              </div>
+              <FaTrash
+                color="gray"
+                style={{ cursor: 'pointer', marginTop: '5px' }}
+                onClick={() => handleRemove(index)}
+              />
+            </div>
           ))}
-        </tbody>
-      </Table>
+        </div>
+      )}
 
-      <hr />
-      <div className="d-flex justify-content-end">
-        <strong>SUBTOTAL:</strong>
-        <span className="text-success ms-2">₹{subtotal.toFixed(2)}</span>
-      </div>
-      <div className="d-flex justify-content-end mb-4">
-        <strong>TOTAL:</strong>
-        <span className="text-success ms-2">₹{subtotal.toFixed(2)}</span>
-      </div>
+      {cartItems.length > 0 && (
+        <>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontWeight: 'bold',
+              marginBottom: '12px',
+              fontSize: '15px',
+            }}
+          >
+            <span>Subtotal</span>
+            <span style={{ color: 'green' }}>₹{subtotal.toFixed(2)}</span>
+          </div>
 
-      <div className="d-flex gap-2 justify-content-end">
-        <Button variant="success" className="w-10" onClick={() => setShowModal(true)}>
-          View Cart
-        </Button>
-        <Button variant="warning" className="w-10" onClick={() => setShowBill(true)}>
-          Checkout
-        </Button>
-      </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Button
+              style={{
+                flex: 1,
+                backgroundColor: '#343a40',
+                border: 'none',
+                fontWeight: 'bold',
+              }}
+              onClick={() => navigate('/view-cart')}
+            >
+              View Cart
+            </Button>
+            <Button
+                          style={{
+                            flex: 1,
+                            backgroundColor: 'green',
+                            border: 'none',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                          }}
+                          onClick={() => navigate('/login')}
+                        >
+                          Checkout
+                        </Button>
+          </div>
+        </>
+      )}
 
-      {/* ✅ View Cart Modal */}
-      <ViewPage show={showModal} onClose={() => setShowModal(false)} />
-
-      {/* ✅ Billing Page Modal */}
-      <BillPage show={showBill} onClose={() => setShowBill(false)} />
+     
     </div>
   );
 };

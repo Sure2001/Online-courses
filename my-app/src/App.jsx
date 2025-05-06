@@ -27,6 +27,11 @@ import UiuxTeacherProfiles from "./teacherpage/UiuxTeacherProfiles";
 import CartSummary from "./cartpages/CartSummary";
 import ViewPage from "./cartpages/ViewPage";
 import Bill from "./cartpages/BillPage";
+import LoginRegisterPage from "./cartpages/LoginRegisterPage";
+import RegisterPage from "./cartpages/RegisterPage";
+import OrderSummary from "./cartpages/OrderSummry";
+import OrderConfirmation from "./cartpages/ConfirmSummary";
+
 // Admin
 import AdminLoginPage  from "./my-admin/AdminLogin";
 import AdminLayout from "./my-admin/layout/AdminLayout";
@@ -34,6 +39,7 @@ import Dashboard from "./my-admin/pages/Dashboard";
 import User from "./my-admin/pages/User";
 import Order from "./my-admin/pages/Order";
 import Profile from "./my-admin/components/ProfilePage";
+
 
 function App() {
   return (
@@ -85,8 +91,13 @@ function AppRoutes() {
         <Route path="/contact" element={<ContactPage/>}/>
 
         <Route path="/card" element={<CartSummary />} />
-        <Route path="/view" element={<ViewPage />}/>
+        <Route path="/view-cart" element={<ViewPage />} />
         <Route path="/bill" element={<Bill />}/>
+        <Route path="/login" element={<LoginRegisterPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/ordersummary" element={<OrderSummary />} />
+        <Route path="/confirmorder" element={<OrderConfirmation />} />
+       
 
         <Route path="/adminlogin" element={<AdminLoginPage />} />
         <Route path="/admin" element={<AdminLayout />}>
