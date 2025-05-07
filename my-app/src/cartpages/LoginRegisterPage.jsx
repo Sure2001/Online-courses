@@ -137,11 +137,11 @@ const AuthPage = () => {
       {authMode === "returning" && (
         <div className="form-box">
           <h2>Returning Customer</h2>
-          <div className="input-group">
+          <div className="input-groups">
             <label>Email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
-          <div className="input-group">
+          <div className="input-groups">
             <label>Password</label>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
@@ -153,32 +153,32 @@ const AuthPage = () => {
         <form className="form-box" onSubmit={handleRegister}>
         <h2>Register Account</h2>
         <div className="two-column-grid">
-          <div className="input-group">
+          <div className="input-groups">
             <label>Username</label>
             <input type="text" name="username" value={form.username} onChange={handleChange} />
             {errors.username && <span className="error">{errors.username}</span>}
           </div>
-          <div className="input-group">
+          <div className="input-groups">
             <label>Email</label>
             <input type="email" name="email" value={form.email} onChange={handleChange} />
             {errors.email && <span className="error">{errors.email}</span>}
           </div>
-          <div className="input-group">
+          <div className="input-groups">
             <label>Mobile</label>
             <input type="text" name="mobile" value={form.mobile} onChange={handleChange} />
             {errors.mobile && <span className="error">{errors.mobile}</span>}
           </div>
-          <div className="input-group">
+          <div className="input-groups">
             <label>Image</label>
             <input type="file" name="image" onChange={handleChange} />
             {preview && <img src={preview} alt="preview" style={{ width: "80px", marginTop: "5px" }} />}
           </div>
-          <div className="input-group">
+          <div className="input-groups">
             <label>Password</label>
             <input type="password" name="password" value={form.password} onChange={handleChange} />
             {errors.password && <span className="error">{errors.password}</span>}
           </div>
-          <div className="input-group">
+          <div className="input-groups">
             <label>Confirm Password</label>
             <input
               type="password"

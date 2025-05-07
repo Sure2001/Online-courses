@@ -50,24 +50,24 @@
 }
 
 /* Input group styling */
-.input-group {
+.input-groups {
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
 }
-.input-group label {
+.input-groups label {
   margin-bottom: 6px;
   font-size: 14px;
   color:black;
 }
-.input-group input {
+.input-groups input {
   padding: 10px;
   border-radius: 10px;
   border: 2px solid #444;
   background-color: white;
   color:black;
 }
-.input-group input[type="file"] {
+.input-groups input[type="file"] {
   padding: 5px;
 }
 

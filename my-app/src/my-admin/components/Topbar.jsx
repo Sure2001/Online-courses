@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom"; // ✅ Import Link
-import { Dropdown } from "react-bootstrap";
+import { Container, Dropdown } from "react-bootstrap";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import A from "../avatar-01.jpg";
 
@@ -12,12 +12,12 @@ const Topbar = () => {
   };
 
   return (
-    <div className="d-flex justify-content-between align-items-center px-4 py-2 border-bottom bg-light">
+    <Container className="border-bottom" style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'light'}}>
       <div>
-        <h5 className="mb-0">Dashboard</h5>
+        <h3 style={{color:'red',fontFamily:'sans-serif',fontWeight:'bold'}}>SKILL-COURSE ADMINPANAL</h3>
       </div>
 
-      <div className="d-flex align-items-center">
+      <div style={{alignItems:'center',display:'flex'}}>
         <Dropdown align="end">
           <Dropdown.Toggle
             variant="light"
@@ -31,7 +31,7 @@ const Topbar = () => {
               width="40"
               height="40"
             />
-            <span className="fw-medium">Admin</span>
+            <span style={{color:'black',marginTop:'0px'}}>Admin</span>
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
@@ -47,7 +47,7 @@ const Topbar = () => {
           </Dropdown.Menu>
         </Dropdown>
       </div>
-    </div>
+    </Container>
   );
 };
 

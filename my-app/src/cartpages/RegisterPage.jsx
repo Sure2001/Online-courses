@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './RegisterPage.css';
 import { useCart } from './CartContext'; // Importing the useCart hook
 
 const RegisterPage = () => {

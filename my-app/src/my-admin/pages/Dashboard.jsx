@@ -8,8 +8,8 @@ const Dashboard = () => {
   return (
     <Container fluid className="bg-light p-4 min-vh-100">
       {/* Breadcrumb */}
-      <div className="mb-3 text-muted">
-        <h4 className="fw-semibold">Dashboard</h4>
+      <div className="text-muted mb-4" style={{textAlign:'start',color:'muted'}}>
+        <h3 style={{fontFamily:'sans-serif'}}>Dashboard</h3>
       </div>
 
       {/* Top Cards */}
