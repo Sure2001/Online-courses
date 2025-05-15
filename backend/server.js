@@ -4,6 +4,7 @@ const multer = require("multer");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const path = require("path");
+const { console } = require("inspector");
 // const Course = require("./models/course");
 
 const app = express();
@@ -66,12 +67,20 @@ const bannerSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
+// Category Schema
+const categorySchema = new mongoose.Schema({
+  type: { type: String, required: true },
+  subCategory: { type: String, required: true }, // ✅ must be here
+  status: { type: String, enum: ["enable", "disable"], default: "enable" },
+});
+
 
 // Models
 const User = mongoose.model("User", userSchema);
 const Order = mongoose.model("Order", orderSchema);
 const Course = mongoose.model("Course", courseSchema);
 const Banner = mongoose.model("Banner", bannerSchema);
+const Category = mongoose.model("Category", categorySchema);
 
 
 // ================= FRONTEND API =================
@@ -149,54 +158,7 @@ app.put("/api/courses", async (req, res) => {
 });
 
 
-// ========== BANNER ==========
 
-// Get all banners
-app.get("/api/banner", async (req, res) => {
-  try {
-    const banners = await Banner.find();
-    res.json(banners);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching banners" });
-  }
-});
-
-// Create or update (first) banner
-app.post("/api/banner", upload.single("image"), async (req, res) => {
-  try {
-    const { title, description } = req.body;
-    const update = { title, description };
-    if (req.file) update.image = `/uploads/${req.file.filename}`;
-
-    const banner = new Banner(update);
-    await banner.save();
-    res.json(banner);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to add banner" });
-  }
-});
-
-// Disable all banners
-app.put("/api/banner/disableAll", async (req, res) => {
-  try {
-    await Banner.updateMany({}, { $set: { status: false } });
-    res.json({ message: "All banners disabled" });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to disable all banners" });
-  }
-});
-
-// Update banner status by ID
-app.put("/api/banner/:id/status", async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  try {
-    const updatedBanner = await Banner.findByIdAndUpdate(id, { status }, { new: true });
-    res.json(updatedBanner);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update banner status" });
-  }
-});
 
 
 
@@ -305,6 +267,128 @@ app.delete("/api/orders/:id", async (req, res) => {
     res.status(500).json({ message: "Failed to delete order" });
   }
 });
+// ========== BANNER ==========
+
+// Get all banners
+app.get("/api/banner", async (req, res) => {
+  try {
+    const banners = await Banner.find();
+    res.json(banners);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching banners" });
+  }
+});
+
+// Create or update (first) banner
+app.post("/api/banner", upload.single("image"), async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const update = { title, description };
+    if (req.file) update.image = `/uploads/${req.file.filename}`;
+
+    const banner = new Banner(update);
+    await banner.save();
+    res.json(banner);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add banner" });
+  }
+});
+
+// Disable all banners
+app.put("/api/banner/disableAll", async (req, res) => {
+  try {
+    await Banner.updateMany({}, { $set: { status: false } });
+    res.json({ message: "All banners disabled" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to disable all banners" });
+  }
+});
+
+// Update banner status by ID
+app.put("/api/banner/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    const updatedBanner = await Banner.findByIdAndUpdate(id, { status }, { new: true });
+    res.json(updatedBanner);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update banner status" });
+  }
+});
+// DELETE /api/banner/:id
+app.delete('/api/banner/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Banner.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Banner not found" });
+    }
+    res.json({ message: "Banner deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting banner:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+// DELETE /api/banner
+app.delete('/api/banner', async (req, res) => {
+  try {
+    const { ids } = req.body; // expects { ids: ["id1", "id2", ...] }
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: "No banner IDs provided" });
+    }
+
+    const result = await Banner.deleteMany({ _id: { $in: ids } });
+
+    res.json({
+      message: `${result.deletedCount} banners deleted successfully`,
+    });
+  } catch (err) {
+    console.error("Bulk delete error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Create Category
+app.post("/api/categories", async (req, res) => {
+  try {
+    const { type, subCategory, status } = req.body;
+    const newCategory = new Category({ type, subCategory, status });
+    await newCategory.save();
+    res.status(201).json({ message: "Category added successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to add category", details: err.message });
+  }
+});
+
+// Get Categories (with search)
+app.get("/api/categories", async (req, res) => {
+  try {
+    const search = req.query.search || "";
+    const query = {
+      $or: [
+        { type: { $regex: search, $options: "i" } },
+        { subCategory: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+      ],
+    };
+    const categories = await Category.find(query);
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+});
+
+// Delete Category by ID
+app.delete("/api/categories/:id", async (req, res) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    res.json({ message: "Category deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete category" });
+  }
+});
+
 
 
 // Start server

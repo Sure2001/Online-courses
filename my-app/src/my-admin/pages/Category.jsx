@@ -6,15 +6,22 @@ import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
 
-const Category = () => {
+const AdminCategory = () => {
   const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState({ name: "", status: "enable" });
+  const [form, setForm] = useState({
+    type: "",
+    subCategory: "",
+    status: "enable",
+  });
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [viewCategory, setViewCategory] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editCategory, setEditCategory] = useState(null);
+const [showEditModal, setShowEditModal] = useState(false);
+
 
   const limit = 5;
 
@@ -26,21 +33,32 @@ const Category = () => {
     axios
       .get(`http://localhost:5000/api/categories?search=${search}`)
       .then((res) => {
-        const sorted = res.data.reverse(); // Descending
-        setCategories(sorted);
+        setCategories(res.data.reverse());
       })
-      .catch((err) => console.error("Error fetching categories:", err));
+      .catch((err) => console.error("Fetch Error:", err));
   };
 
   const handleSubmit = (e) => {
+    console.log(form);
+    
     e.preventDefault();
     axios
       .post("http://localhost:5000/api/categories", form)
       .then(() => {
-        setForm({ name: "", status: "enable" });
+        setForm({
+          type: "",
+          subCategory: "",
+          status: "enable",
+        });
         fetchCategories();
       })
-      .catch((err) => console.error("Add Category Error:", err));
+      .catch((err) => {
+        if (err.response) {
+          console.error("Server error:", err.response.data);
+        } else {
+          console.error("Error:", err.message);
+        }
+      });
   };
 
   const handleDelete = (id) => {
@@ -52,7 +70,9 @@ const Category = () => {
 
   const handleBulkDelete = () => {
     Promise.all(
-      selectedCategories.map((id) => axios.delete(`http://localhost:5000/api/categories/${id}`))
+      selectedCategories.map((id) =>
+        axios.delete(`http://localhost:5000/api/categories/${id}`)
+      )
     )
       .then(() => {
         setSelectedCategories([]);
@@ -64,7 +84,8 @@ const Category = () => {
 
   const exportToExcel = () => {
     const data = categories.map((cat) => ({
-      Name: cat.name,
+      Type: cat.type,
+      SubCategory: cat.subCategory,
       Status: cat.status,
     }));
     const ws = XLSX.utils.json_to_sheet(data);
@@ -76,7 +97,11 @@ const Category = () => {
 
   const exportToCSV = () => {
     const csv = Papa.unparse(
-      categories.map((cat) => ({ Name: cat.name, Status: cat.status }))
+      categories.map((cat) => ({
+        Type: cat.type,
+        SubCategory: cat.subCategory,
+        Status: cat.status,
+      }))
     );
     saveAs(new Blob([csv], { type: "text/csv;charset=utf-8;" }), "categories.csv");
   };
@@ -86,19 +111,38 @@ const Category = () => {
 
   return (
     <div className="container mt-4">
-      <h3>Manage Categories</h3>
+      <h3>Add Categories</h3>
 
       {/* --- Form --- */}
       <Form onSubmit={handleSubmit} className="mb-4">
         <Form.Group className="mb-2">
-          <Form.Label>Category Name</Form.Label>
-          <Form.Control
-            type="text"
-            value={form.name}
+          <Form.Label>Category Type</Form.Label>
+          <Form.Select
+            value={form.type}
+            onChange={(e) =>
+              setForm({ ...form, type: e.target.value, subCategory: "" })
+            }
             required
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
+          >
+            <option value="">-- Select Type --</option>
+            <option value="coding">Coding</option>
+            <option value="non-coding">Non-Coding</option>
+          </Form.Select>
         </Form.Group>
+
+        {form.type && (
+          <Form.Group className="mb-2">
+            <Form.Label>SubCategory Name</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter subcategory"
+              value={form.subCategory}
+              onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
+              required
+            />
+          </Form.Group>
+        )}
+
         <Form.Group className="mb-2">
           <Form.Label>Status</Form.Label>
           <Form.Select
@@ -109,7 +153,8 @@ const Category = () => {
             <option value="disable">Disable</option>
           </Form.Select>
         </Form.Group>
-        <Button type="submit">Submit</Button>
+
+        <button style={{ backgroundColor: "#007bff", color: "white"  }} type="submit">Submit</button>
       </Form>
 
       {/* --- Search + Export + Bulk Delete --- */}
@@ -124,20 +169,24 @@ const Category = () => {
         />
         <div className="d-flex gap-3 align-items-center">
           {selectedCategories.length > 0 && (
-            <Button variant="danger" onClick={handleBulkDelete}>
+            <button title="Delete selected"
+              style={{ border: "none", color: "red", fontSize: "32px", background: "transparent" }} onClick={handleBulkDelete}>
               <FaTrashAlt />
-            </Button>
+            </button>
           )}
-          <Button variant="success" onClick={exportToExcel}>
-            <FaFileExcel />
-          </Button>
-          <Button variant="info" onClick={exportToCSV}>
+          <button title="Export to CSV"
+            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }} onClick={exportToCSV}>
             <FaFileCsv />
-          </Button>
+          </button>
+           <button title="Export to Excel"
+            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }} onClick={exportToExcel}>
+            <FaFileExcel />
+          </button>
         </div>
       </div>
 
       {/* --- Table --- */}
+      <div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "5px" }}>
       <table className="table table-bordered text-center">
         <thead>
           <tr>
@@ -153,7 +202,8 @@ const Category = () => {
                 }}
               />
             </th>
-            <th>Name</th>
+            <th>Type</th>
+            <th>SubCategory</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -174,26 +224,35 @@ const Category = () => {
                   }
                 />
               </td>
-              <td>{cat.name}</td>
+              <td>{cat.type}</td>
+              <td>{cat.subCategory}</td>
               <td>{cat.status}</td>
               <td>
-                <Button
-                  size="sm"
-                  variant="primary"
-                  className="me-2"
+                <button
+                  style={{ border: "none", color: "blue", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                  onClick={() => {
+                    setEditCategory(cat);
+                    setShowEditModal(true);
+                  }}
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }}
                   onClick={() => {
                     setViewCategory(cat);
                     setShowModal(true);
                   }}
                 >
                   <FaEye />
-                </Button>
-                <Button size="sm" variant="warning" className="me-2">
-                  <FaEdit />
-                </Button>
-                <Button size="sm" variant="danger" onClick={() => handleDelete(cat._id)}>
+                </button>
+                
+                <button
+                  style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                  onClick={() => handleDelete(cat._id)}
+                >
                   <FaTrashAlt />
-                </Button>
+                </button>
               </td>
             </tr>
           ))}
@@ -201,26 +260,26 @@ const Category = () => {
       </table>
 
       {/* --- Pagination --- */}
-      <div className="d-flex justify-content-between align-items-center">
-        <Button
-          variant="link"
+      <div className="mt-3 d-flex gap-3 align-items-center">
+        <button
+          style={{ border: "none", background: "transparent", color: "blue" }}
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           disabled={currentPage === 1}
         >
           &laquo; Prev
-        </Button>
+        </button>
         <span>
           Page {currentPage} of {totalPages}
         </span>
-        <Button
-          variant="link"
+        <button
+          style={{ border: "none", background: "transparent", color: "blue" }}
           onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
           disabled={currentPage === totalPages}
         >
           Next &raquo;
-        </Button>
+        </button>
       </div>
-
+</div>
       {/* --- View Modal --- */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
@@ -229,8 +288,9 @@ const Category = () => {
         <Modal.Body>
           {viewCategory && (
             <>
-              <h5>Name: {viewCategory.name}</h5>
-              <h6>Status: {viewCategory.status}</h6>
+              <p><strong>Type:</strong> {viewCategory.type}</p>
+              <p><strong>SubCategory:</strong> {viewCategory.subCategory}</p>
+              <p><strong>Status:</strong> {viewCategory.status}</p>
             </>
           )}
         </Modal.Body>
@@ -242,4 +302,4 @@ const Category = () => {
   );
 };
 
-export default Category;
+export default AdminCategory;

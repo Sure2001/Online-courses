@@ -5,10 +5,11 @@ import {
   FaTrashAlt,
   FaFileCsv,
   FaFileExcel,
-  FaEye,
+  FaEye,FaRegPlusSquare,
 } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+
 
 const AdminBanner = () => {
   const [title, setTitle] = useState("");
@@ -79,30 +80,44 @@ const AdminBanner = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  // const handleDelete = async (id) => {
+  //   if (!window.confirm("Are you sure you want to delete this banner?")) return;
+  //   try {
+  //     await axios.delete(`http://localhost:5000/api/banner/${id}`);
+  //     fetchBanners();
+  //   } catch (err) {
+  //     console.error("Failed to delete banner", err);
+  //   }
+  // };
+
+    const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this banner?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/banner/${id}`);
-      fetchBanners();
-    } catch (err) {
-      console.error("Failed to delete banner", err);
+      const res = await fetch(`${API_URL}/banner/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok) {
+        setBanners((prev) => prev.filter((banner) => banner._id !== id));
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting banner:", error);
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (!window.confirm("Delete selected banners?")) return;
-    try {
-      await Promise.all(
-        selectedIds.map((id) =>
-          axios.delete(`http://localhost:5000/api/banner/${id}`)
-        )
-      );
-      setSelectedIds([]);
-      fetchBanners();
-    } catch (err) {
-      console.error("Bulk delete failed", err);
-    }
-  };
+ const handleBulkDelete = async () => {
+  if (!window.confirm("Delete selected banners?")) return;
+  try {
+    const res = await axios.delete("http://localhost:5000/api/banner", {
+      data: { ids: selectedIds },
+    });
+    setSelectedIds([]);
+    fetchBanners(); // refresh list
+  } catch (err) {
+    console.error("Bulk delete failed", err);
+  }
+};
+
 
   const handleView = (banner) => {
     alert(
@@ -181,12 +196,7 @@ const AdminBanner = () => {
 
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Banner Management</h3>
-        <Button variant="primary" onClick={handleShow}>
-          + Add New Banner
-        </Button>
-      </div>
+     
 
       {/* Add Banner Modal */}
       <Modal show={showModal} onHide={handleClose}>
@@ -238,25 +248,31 @@ const AdminBanner = () => {
           </Form>
         </Modal.Body>
       </Modal>
-
+ <h3>Banner Management</h3>
       <div className="d-flex justify-content-end gap-2 mb-3">
+        <button style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
+        title="Add New Banner"
+ onClick={handleShow}>
+         <FaRegPlusSquare />
+        </button>
+      
         {selectedIds.length > 0 && (
-          <Button variant="danger" onClick={handleBulkDelete}>
-            <FaTrashAlt /> Delete Selected
-          </Button>
+          <button  style={{ border: "none", color: "red", fontSize: "32px", background: "transparent" }} title="Delete Selected Banners" onClick={handleBulkDelete}>
+            <FaTrashAlt />
+          </button>
         )}
-        <Button variant="outline-primary" onClick={exportToCSV}>
-          <FaFileCsv /> CSV
-        </Button>
-        <Button variant="outline-success" onClick={exportToExcel}>
-          <FaFileExcel /> Excel
-        </Button>
+        <button  style={{ border: "none", color: "skyblue", fontSize: "32px", background: "transparent" }} title="Export to CSV" onClick={exportToCSV}>
+          <FaFileCsv />
+        </button>
+        <button  style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }} title="Export to Excel" onClick={exportToExcel}>
+          <FaFileExcel />
+        </button>
       </div>
-
-      <table className="table table-bordered text-center">
+<div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "5px" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
         <thead>
           <tr>
-            <th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>
               <input
                 type="checkbox"
                 checked={
@@ -272,18 +288,18 @@ const AdminBanner = () => {
                 }}
               />
             </th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Image</th>
-            <th>Status</th>
-            <th>Toggle</th>
-            <th>Actions</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Title</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Description</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Image</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Toggle</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {currentBanners.map((banner) => (
             <tr key={banner._id}>
-              <td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(banner._id)}
@@ -296,18 +312,18 @@ const AdminBanner = () => {
                   }
                 />
               </td>
-              <td>{banner.title}</td>
-              <td>{banner.description}</td>
-              <td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{banner.title}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{banner.description}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                 {banner.image && (
-                  <Image
+                  <img
                     src={`http://localhost:5000${banner.image}`}
                     thumbnail
-                    style={{ width: "100px" }}
+                    style={{ width: "50px", height: "50px", objectFit: "cover" }}
                   />
                 )}
               </td>
-              <td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                 <span
                   className={`badge ${
                     banner.status ? "bg-success" : "bg-secondary"
@@ -316,7 +332,7 @@ const AdminBanner = () => {
                   {banner.status ? "Enabled" : "Disabled"}
                 </span>
               </td>
-              <td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                 <label style={switchStyle}>
                   <input
                     type="checkbox"
@@ -331,22 +347,20 @@ const AdminBanner = () => {
                   </span>
                 </label>
               </td>
-              <td>
-                <Button
-                  variant="outline-success"
-                  size="sm"
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                <button
+                 style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }}
                   onClick={() => handleView(banner)}
-                  className="me-2"
+          
                 >
                   <FaEye />
-                </Button>
-                <Button
-                  variant="outline-danger"
-                  size="sm"
+                </button>
+                <button
+                  style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }}
                   onClick={() => handleDelete(banner._id)}
                 >
                   <FaTrashAlt />
-                </Button>
+                </button>
               </td>
             </tr>
           ))}
@@ -354,23 +368,32 @@ const AdminBanner = () => {
       </table>
 
       {/* Pagination */}
-      <div className="d-flex justify-content-center mt-3">
-        <Button
-          variant="outline-secondary"
+      <div className="mt-3 d-flex gap-3 align-items-center">
+        <button
+          style={{ border: "none", background: "transparent", color: "blue" }}
           disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
+          onClick={() => {
+  setCurrentPage(currentPage - 1);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}}
+
         >
           Prev
-        </Button>
+        </button>
         <span className="mx-3">Page {currentPage} of {totalPages}</span>
-        <Button
-          variant="outline-secondary"
+        <button
+          style={{ border: "none", background: "transparent", color: "blue" }}
           disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(currentPage + 1)}
+          onClick={() => {
+  setCurrentPage(currentPage + 1);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}}
+
         >
           Next
-        </Button>
+        </button>
       </div>
+    </div>
     </div>
   );
 };
