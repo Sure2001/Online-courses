@@ -18,10 +18,9 @@ const AdminCategory = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [viewCategory, setViewCategory] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [editCategory, setEditCategory] = useState(null);
-const [showEditModal, setShowEditModal] = useState(false);
-
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const limit = 5;
 
@@ -39,8 +38,6 @@ const [showEditModal, setShowEditModal] = useState(false);
   };
 
   const handleSubmit = (e) => {
-    console.log(form);
-    
     e.preventDefault();
     axios
       .post("http://localhost:5000/api/categories", form)
@@ -106,6 +103,25 @@ const [showEditModal, setShowEditModal] = useState(false);
     saveAs(new Blob([csv], { type: "text/csv;charset=utf-8;" }), "categories.csv");
   };
 
+ const handleUpdateCategory = (e) => {
+  e.preventDefault();
+
+  axios
+    .put(`http://localhost:5000/api/categories/${editCategory._id}`, editCategory)
+    .then((res) => {
+      console.log("Updated:", res.data);
+      setShowEditModal(false);
+      setEditCategory(null);
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat._id === res.data._id ? res.data : cat
+        )
+      ); // Update the local state manually
+    })
+    .catch((err) => console.error("Update error:", err));
+};
+
+
   const paginatedData = categories.slice((currentPage - 1) * limit, currentPage * limit);
   const totalPages = Math.ceil(categories.length / limit);
 
@@ -119,9 +135,7 @@ const [showEditModal, setShowEditModal] = useState(false);
           <Form.Label>Category Type</Form.Label>
           <Form.Select
             value={form.type}
-            onChange={(e) =>
-              setForm({ ...form, type: e.target.value, subCategory: "" })
-            }
+            onChange={(e) => setForm({ ...form, type: e.target.value, subCategory: "" })}
             required
           >
             <option value="">-- Select Type --</option>
@@ -154,7 +168,9 @@ const [showEditModal, setShowEditModal] = useState(false);
           </Form.Select>
         </Form.Group>
 
-        <button style={{ backgroundColor: "#007bff", color: "white"  }} type="submit">Submit</button>
+        <button style={{ backgroundColor: "#007bff", color: "white" }} type="submit">
+          Submit
+        </button>
       </Form>
 
       {/* --- Search + Export + Bulk Delete --- */}
@@ -169,17 +185,26 @@ const [showEditModal, setShowEditModal] = useState(false);
         />
         <div className="d-flex gap-3 align-items-center">
           {selectedCategories.length > 0 && (
-            <button title="Delete selected"
-              style={{ border: "none", color: "red", fontSize: "32px", background: "transparent" }} onClick={handleBulkDelete}>
+            <button
+              title="Delete selected"
+              style={{ border: "none", color: "red", fontSize: "32px", background: "transparent" }}
+              onClick={handleBulkDelete}
+            >
               <FaTrashAlt />
             </button>
           )}
-          <button title="Export to CSV"
-            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }} onClick={exportToCSV}>
+          <button
+            title="Export to CSV"
+            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
+            onClick={exportToCSV}
+          >
             <FaFileCsv />
           </button>
-           <button title="Export to Excel"
-            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }} onClick={exportToExcel}>
+          <button
+            title="Export to Excel"
+            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
+            onClick={exportToExcel}
+          >
             <FaFileExcel />
           </button>
         </div>
@@ -187,99 +212,99 @@ const [showEditModal, setShowEditModal] = useState(false);
 
       {/* --- Table --- */}
       <div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "5px" }}>
-      <table className="table table-bordered text-center">
-        <thead>
-          <tr>
-            <th>
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={(e) => {
-                  setSelectAll(e.target.checked);
-                  setSelectedCategories(
-                    e.target.checked ? paginatedData.map((c) => c._id) : []
-                  );
-                }}
-              />
-            </th>
-            <th>Type</th>
-            <th>SubCategory</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedData.map((cat) => (
-            <tr key={cat._id}>
-              <td>
+        <table className="table table-bordered text-center">
+          <thead>
+            <tr>
+              <th>
                 <input
                   type="checkbox"
-                  checked={selectedCategories.includes(cat._id)}
-                  onChange={(e) =>
-                    setSelectedCategories((prev) =>
-                      e.target.checked
-                        ? [...prev, cat._id]
-                        : prev.filter((id) => id !== cat._id)
-                    )
-                  }
+                  checked={selectAll}
+                  onChange={(e) => {
+                    setSelectAll(e.target.checked);
+                    setSelectedCategories(
+                      e.target.checked ? paginatedData.map((c) => c._id) : []
+                    );
+                  }}
                 />
-              </td>
-              <td>{cat.type}</td>
-              <td>{cat.subCategory}</td>
-              <td>{cat.status}</td>
-              <td>
-                <button
-                  style={{ border: "none", color: "blue", fontSize: "18px", marginRight: "15px", background: "transparent" }}
-                  onClick={() => {
-                    setEditCategory(cat);
-                    setShowEditModal(true);
-                  }}
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }}
-                  onClick={() => {
-                    setViewCategory(cat);
-                    setShowModal(true);
-                  }}
-                >
-                  <FaEye />
-                </button>
-                
-                <button
-                  style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }}
-                  onClick={() => handleDelete(cat._id)}
-                >
-                  <FaTrashAlt />
-                </button>
-              </td>
+              </th>
+              <th>Type</th>
+              <th>SubCategory</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {paginatedData.map((cat) => (
+              <tr key={cat._id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(cat._id)}
+                    onChange={(e) =>
+                      setSelectedCategories((prev) =>
+                        e.target.checked
+                          ? [...prev, cat._id]
+                          : prev.filter((id) => id !== cat._id)
+                      )
+                    }
+                  />
+                </td>
+                <td>{cat.type}</td>
+                <td>{cat.subCategory}</td>
+                <td>{cat.status}</td>
+                <td>
+                  <button
+                    style={{ border: "none", color: "blue", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                    onClick={() => {
+                      setEditCategory(cat);
+                      setShowEditModal(true);
+                    }}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                    onClick={() => {
+                      setViewCategory(cat);
+                      setShowModal(true);
+                    }}
+                  >
+                    <FaEye />
+                  </button>
+                  <button
+                    style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                    onClick={() => handleDelete(cat._id)}
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      {/* --- Pagination --- */}
-      <div className="mt-3 d-flex gap-3 align-items-center">
-        <button
-          style={{ border: "none", background: "transparent", color: "blue" }}
-          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-        >
-          &laquo; Prev
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          style={{ border: "none", background: "transparent", color: "blue" }}
-          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-        >
-          Next &raquo;
-        </button>
+        {/* --- Pagination --- */}
+        <div className="mt-3 d-flex gap-3 align-items-center">
+          <button
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            &laquo; Prev
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next &raquo;
+          </button>
+        </div>
       </div>
-</div>
+
       {/* --- View Modal --- */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
@@ -297,6 +322,68 @@ const [showEditModal, setShowEditModal] = useState(false);
         <Modal.Footer>
           <Button onClick={() => setShowModal(false)}>Close</Button>
         </Modal.Footer>
+      </Modal>
+
+      {/* --- Edit Modal --- */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Category</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleUpdateCategory}>
+          <Modal.Body>
+            {editCategory && (
+              <>
+                <Form.Group className="mb-2">
+                  <Form.Label>Type</Form.Label>
+                  <Form.Select
+                    value={editCategory.type}
+                    onChange={(e) =>
+                      setEditCategory({ ...editCategory, type: e.target.value, subCategory: "" })
+                    }
+                    required
+                  >
+                    <option value="">-- Select Type --</option>
+                    <option value="coding">Coding</option>
+                    <option value="non-coding">Non-Coding</option>
+                  </Form.Select>
+                </Form.Group>
+
+                <Form.Group className="mb-2">
+                  <Form.Label>SubCategory</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={editCategory.subCategory}
+                    onChange={(e) =>
+                      setEditCategory({ ...editCategory, subCategory: e.target.value })
+                    }
+                    required
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-2">
+                  <Form.Label>Status</Form.Label>
+                  <Form.Select
+                    value={editCategory.status}
+                    onChange={(e) =>
+                      setEditCategory({ ...editCategory, status: e.target.value })
+                    }
+                  >
+                    <option value="enable">Enable</option>
+                    <option value="disable">Disable</option>
+                  </Form.Select>
+                </Form.Group>
+              </>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              Update
+            </Button>
+          </Modal.Footer>
+        </Form>
       </Modal>
     </div>
   );

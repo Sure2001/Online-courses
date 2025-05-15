@@ -388,6 +388,15 @@ app.delete("/api/categories/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to delete category" });
   }
 });
+app.put("/api/categories/:id", async (req, res) => {
+  try {
+    const updated = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
 
 
 
