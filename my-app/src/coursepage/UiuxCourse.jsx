@@ -42,20 +42,23 @@ const UiuxCourse = () => {
   };
 
   const handleEnroll = () => {
-    const allLevels = Object.keys(levelPrices);
-
-    allLevels.forEach((level) => {
-      addToCart({
-        title: "UI/UX Design",
-        level: level,
-        price: levelPrices[level],
-      });
-    });
-
-    toast.success("✅ Enrolled in UI/UX Design (All Levels)");
-
-    // 👇 Redirect to cart page
-    navigate('/login');
+     if (selectedLevels.length === 0) {
+          toast.error('⚠️ Please select at least one level before Enrolling');
+        } else {
+          selectedLevels.forEach((level) => {
+            addToCart({
+              title: 'UI/UX Design',
+              level: level,
+              price: levelPrices[level],
+            });
+          });
+          toast.success(`🛒 Enrolling : ${selectedLevels.join(', ')} level(s)`);
+      
+          // 👇 Delay navigation to cart page
+          setTimeout(() => {
+            navigate('/login');
+          }, 3000); // 3000 milliseconds = 3 seconds
+        }
   };
 
   return (

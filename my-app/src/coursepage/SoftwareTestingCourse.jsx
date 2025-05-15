@@ -42,20 +42,23 @@ const SoftwareTestingCourse = () => {
   };
 
   const handleEnroll = () => {
-      const allLevels = Object.keys(levelPrices);
-  
-      allLevels.forEach((level) => {
-        addToCart({
-          title: 'Software Testing',
-          level: level,
-          price: levelPrices[level],
-        });
-      });
-  
-      toast.success('✅ Enrolled in Software Testing (All Levels)');
-  
-      // 👇 Redirect to cart page
-      navigate('/login');;
+       if (selectedLevels.length === 0) {
+            toast.error('⚠️ Please select at least one level before Enrolling');
+          } else {
+            selectedLevels.forEach((level) => {
+              addToCart({
+                title: 'Software Testing',
+                level: level,
+                price: levelPrices[level],
+              });
+            });
+            toast.success(`🛒 Enrolling : ${selectedLevels.join(', ')} level(s)`);
+        
+            // 👇 Delay navigation to cart page
+            setTimeout(() => {
+              navigate('/login');
+            }, 3000); // 2000 milliseconds = 2 seconds
+          }
     };
 
   return (

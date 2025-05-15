@@ -4,18 +4,15 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { Button, Modal } from "react-bootstrap";
-import "./Table.css";
 import {
   FaEye,
-  FaTrash,
   FaFileExcel,
   FaFileCsv,
   FaEdit,
-  FaArrowLeft,
-  FaArrowRight,
+  FaTrashAlt,
 } from "react-icons/fa";
 
-const Order = () => {
+const Order = ({ onOrderCountChange }) => {
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -25,22 +22,30 @@ const Order = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
 
+  const LIMIT = 5;
+
   useEffect(() => {
     axios
-      .get(
-        `http://localhost:5000/api/orders?page=${currentPage}&limit=10&search=${search}`
-      )
+      .get(`http://localhost:5000/api/orders`)
       .then((res) => {
-        setOrders(res.data.orders || []);
-        setTotalPages(res.data.totalPages || 1);
+        const allOrders = res.data.orders || [];
+        const filtered = allOrders.filter(
+          (o) =>
+            o.userName?.toLowerCase().includes(search.toLowerCase()) ||
+            o.userEmail?.toLowerCase().includes(search.toLowerCase())
+        );
+        const sorted = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setOrders(sorted);
+        setTotalPages(Math.ceil(filtered.length / LIMIT) || 1);
+        onOrderCountChange(filtered.length);  // Pass order count to Dashboard
       })
       .catch((err) => console.error("Error fetching orders:", err));
-  }, [currentPage, search]);
+  }, [search, currentPage, onOrderCountChange]);
 
   const exportToExcel = () => {
     const flatData = orders.map((order) => ({
-      Email: order.billing.email,
-      Phone: order.billing.phone,
+      Email: order.billing?.email || order.userEmail,
+      Name: order.billing?.userName || order.userName,
       Total: order.subtotal,
       PaymentMethod: order.paymentMethod,
       OrderedAt: new Date(order.createdAt).toLocaleString(),
@@ -49,16 +54,13 @@ const Order = () => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Orders");
     const buffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    saveAs(
-      new Blob([buffer], { type: "application/octet-stream" }),
-      "orders.xlsx"
-    );
+    saveAs(new Blob([buffer], { type: "application/octet-stream" }), "orders.xlsx");
   };
 
   const exportToCSV = () => {
     const flatData = orders.map((order) => ({
-      Email: order.billing.email,
-      Phone: order.billing.phone,
+      Email: order.billing?.email || order.userEmail,
+      Name: order.billing?.userName || order.userName,
       Total: order.subtotal,
       PaymentMethod: order.paymentMethod,
       OrderedAt: new Date(order.createdAt).toLocaleString(),
@@ -72,7 +74,7 @@ const Order = () => {
     axios
       .delete(`http://localhost:5000/api/orders/${orderId}`)
       .then(() => {
-        setOrders(orders.filter((order) => order._id !== orderId));
+        setOrders((prev) => prev.filter((order) => order._id !== orderId));
         alert("Order deleted successfully!");
       })
       .catch((err) => console.error("Error deleting order:", err));
@@ -108,7 +110,7 @@ const Order = () => {
         )
       )
         .then(() => {
-          setOrders(orders.filter((order) => !selectedOrders.includes(order._id)));
+          setOrders((prev) => prev.filter((order) => !selectedOrders.includes(order._id)));
           setSelectedOrders([]);
           setSelectAll(false);
           alert("Selected orders deleted successfully!");
@@ -120,55 +122,57 @@ const Order = () => {
     }
   };
 
+  // Paginated data
+  const paginatedOrders = orders.slice((currentPage - 1) * LIMIT, currentPage * LIMIT);
+
   return (
     <div className="container mt-4">
-      <h4 className="mb-3">All Orders</h4>
+      <h3 style={{ fontFamily: "sans-serif", fontSize: "25px" }}>Order List</h3>
+
       <div className="d-flex justify-content-between mb-3">
         <input
           type="text"
-          className="form-control w-25"
-          placeholder="Search by Email"
+          placeholder="Search by name/email"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="form-control"
+          style={{ maxWidth: "300px" }}
         />
-        <div className="d-flex gap-2">
-          <Button className="btn btn-success" onClick={exportToExcel}>
-            <FaFileExcel />
-          </Button>
-          <Button className="btn btn-info" onClick={exportToCSV}>
-            <FaFileCsv />
-          </Button>
+
+        <div className="d-flex align-items-center gap-3">
           {selectedOrders.length > 0 && (
-            <Button variant="danger" onClick={handleBulkDelete} className="ms-2" title="Delete Selected">
-              <FaTrash />
-            </Button>
+            <button onClick={handleBulkDelete} style={{ color: "red", border: "none", background: "transparent", fontSize: "32px" }}>
+              <FaTrashAlt />
+            </button>
           )}
+          <button onClick={exportToCSV} style={{ color: "skyblue", border: "none", background: "transparent", fontSize: "32px" }}>
+            <FaFileCsv />
+          </button>
+          <button onClick={exportToExcel} style={{ color: "green", border: "none", background: "transparent", fontSize: "32px", marginRight: "20px" }}>
+            <FaFileExcel />
+          </button>
         </div>
       </div>
-      <div className="tablediv">
-        <table>
+
+      <div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "5px" }}>
+        <table className="table table-bordered text-center">
           <thead>
             <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  checked={selectAll}
-                  onChange={handleSelectAllChange}
-                />
-              </th>
-              <th>S.no</th>
+              <th><input type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /></th>
               <th>Course Title</th>
               <th>Level</th>
+              <th>User</th>
               <th>Email</th>
-              <th>Phone</th>
-              <th>Total</th>
+              <th>Total (₹)</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, idx) => {
-              const firstItem = order.items[0] || {};
-              const sNo = (currentPage - 1) * 10 + (orders.length - idx);  // Calculate S.no in descending order
+            {paginatedOrders.map((order) => {
+              const item = order.items[0] || {};
               return (
                 <tr key={order._id}>
                   <td>
@@ -178,29 +182,21 @@ const Order = () => {
                       onChange={(e) => handleCheckboxChange(e, order._id)}
                     />
                   </td>
-                  <td>{sNo}</td>  {/* Display S.no in descending order */}
-                  <td>{firstItem.title || "—"}</td>
-                  <td>{firstItem.level || "—"}</td>
-                  <td>{order.billing.email}</td>
-                  <td>{order.billing.phone}</td>
-                  <td>₹{order.subtotal.toFixed(2)}</td>
+                  <td>{item.title || "—"}</td>
+                  <td>{item.level || "—"}</td>
+                  <td>{order.userName}</td>
+                  <td>{order.userEmail}</td>
+                  <td>₹{order.subtotal?.toFixed(2)}</td>
                   <td>
-                    <Button
-                      variant="primary"
-                      onClick={() => handleViewOrder(order)}
-                    >
-                      <FaEye />
-                    </Button>
-                    <Button variant="warning" className="ms-2">
+                    <button style={{ border: "none", color: "blue", fontSize: "18px", marginRight: "15px", background: "transparent" }}>
                       <FaEdit />
-                    </Button>
-                    <Button
-                      variant="danger"
-                      className="ms-2"
-                      onClick={() => handleDeleteOrder(order._id)}
-                    >
-                      <FaTrash />
-                    </Button>
+                    </button>
+                    <button style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }} onClick={() => handleViewOrder(order)}>
+                      <FaEye />
+                    </button>
+                    <button style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }} onClick={() => handleDeleteOrder(order._id)}>
+                      <FaTrashAlt />
+                    </button>
                   </td>
                 </tr>
               );
@@ -208,59 +204,21 @@ const Order = () => {
           </tbody>
         </table>
 
-        {/* Updated Pagination with Icons Only */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "1rem",
-            marginTop: "2rem",
-            flexWrap: "wrap",
-            marginBottom: "2rem",
-          }}
-        >
+        <div className="mt-3 d-flex gap-3 align-items-center">
           <button
-            onClick={() => setCurrentPage(currentPage - 1)}
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
-            style={{
-              padding: "8px 12px",
-              borderRadius: "8px",
-              border: "1px solid #007bff",
-              backgroundColor: currentPage === 1 ? "#e9ecef" : "#ffffff",
-              color: "#007bff",
-              cursor: currentPage === 1 ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1rem",
-            }}
           >
-            <FaArrowLeft />
+            &laquo; Prev
           </button>
-
-          <span style={{ fontWeight: "600", fontSize: "1rem" }}>
-            {currentPage} / {totalPages}
-          </span>
-
+          <span>Page {currentPage} of {totalPages}</span>
           <button
-            onClick={() => setCurrentPage(currentPage + 1)}
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
             disabled={currentPage === totalPages}
-            style={{
-              padding: "8px 12px",
-              borderRadius: "8px",
-              border: "1px solid #007bff",
-              backgroundColor:
-                currentPage === totalPages ? "#e9ecef" : "#ffffff",
-              color: "#007bff",
-              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1rem",
-            }}
           >
-            <FaArrowRight />
+            Next &raquo;
           </button>
         </div>
       </div>
@@ -272,31 +230,24 @@ const Order = () => {
         <Modal.Body>
           {selectedOrderDetails && (
             <div>
-              {selectedOrderDetails.items.map((item, index) => (
-                <div key={index}>
-                  <h6>Course: {item.title}</h6>
-                  <h6>Level: {item.level}</h6>
-                  <h6>
-                    Price: ₹{item.price.toFixed(2)} × {item.quantity}
-                  </h6>
+              {selectedOrderDetails.items.map((item, i) => (
+                <div key={i}>
+                  <p><strong>Course:</strong> {item.title}</p>
+                  <p><strong>Level:</strong> {item.level}</p>
+                  <p><strong>Price:</strong> ₹{item.price?.toFixed(2)} × {item.quantity}</p>
                   <hr />
                 </div>
               ))}
-              <h6>Email: {selectedOrderDetails.billing.email}</h6>
-              <h6>Phone: {selectedOrderDetails.billing.phone}</h6>
-              <h6>Total Amount: ₹{selectedOrderDetails.subtotal.toFixed(2)}</h6>
-              <h6>Payment Method: {selectedOrderDetails.paymentMethod}</h6>
-              <h6>
-                Ordered At:{" "}
-                {new Date(selectedOrderDetails.createdAt).toLocaleString()}
-              </h6>
+              <p><strong>Email:</strong> {selectedOrderDetails.billing?.email || selectedOrderDetails.userEmail}</p>
+              <p><strong>Phone:</strong> {selectedOrderDetails.billing?.phone || "—"}</p>
+              <p><strong>Total:</strong> ₹{selectedOrderDetails.subtotal.toFixed(2)}</p>
+              <p><strong>Payment:</strong> {selectedOrderDetails.paymentMethod || "N/A"}</p>
+              <p><strong>Ordered At:</strong> {new Date(selectedOrderDetails.createdAt).toLocaleString()}</p>
             </div>
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
         </Modal.Footer>
       </Modal>
     </div>

@@ -39,7 +39,7 @@ const ViewPage = () => {
         <p className="text-muted text-center">Your cart is empty.</p>
       ) : (
         <>
-          <Table bordered hover responsive>
+          <Table striped bordered hover responsive>
             <thead>
               <tr>
                 <th>Image</th>

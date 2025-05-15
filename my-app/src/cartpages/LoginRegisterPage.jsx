@@ -107,11 +107,11 @@ const AuthPage = () => {
           <label>
             <input
               type="radio"
-              value="register"
-              checked={authMode === "register"}
-              onChange={() => setAuthMode("register")}
+              value="returning"
+              checked={authMode === "returning"}
+              onChange={() => setAuthMode("returning")}
             />
-            Register Account
+            Returning Customer
           </label>
           {/* <label>
             <input
@@ -125,12 +125,13 @@ const AuthPage = () => {
           <label>
             <input
               type="radio"
-              value="returning"
-              checked={authMode === "returning"}
-              onChange={() => setAuthMode("returning")}
+              value="register"
+              checked={authMode === "register"}
+              onChange={() => setAuthMode("register")}
             />
-            Returning Customer
+            Register Account
           </label>
+          
         </div>
       </div>
 

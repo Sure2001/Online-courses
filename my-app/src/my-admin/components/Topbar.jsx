@@ -14,7 +14,7 @@ const Topbar = () => {
   return (
     <Container className="border-bottom" style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:'light'}}>
       <div>
-        <h3 style={{color:'red',fontFamily:'sans-serif',fontWeight:'bold'}}>SKILL-COURSE ADMINPANAL</h3>
+        <h3 style={{color:'red',fontFamily:'sans-serif',fontWeight:'bold'}}>SKILL-COURSE ADMIN PANEL</h3>
       </div>
 
       <div style={{alignItems:'center',display:'flex'}}>

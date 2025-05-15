@@ -57,7 +57,7 @@ const FullStackCourse = () => {
       // 👇 Delay navigation to cart page
       setTimeout(() => {
         navigate('/login');
-      }, 3000); // 2000 milliseconds = 2 seconds
+      }, 3000); // 3000 milliseconds = 3 seconds
     }
   };
   

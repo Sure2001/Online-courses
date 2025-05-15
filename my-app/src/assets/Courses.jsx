@@ -80,7 +80,7 @@ function Courses() {
                     <button className="buy-btn">Read More</button>
                   </Link>
                 </div>
-              </div>
+               </div>
             </Col>
           ))}
         </Row>
@@ -88,5 +88,4 @@ function Courses() {
     </div>
   );
 }
-
 export default Courses;

@@ -35,7 +35,7 @@ const OrderSummaryPage = () => {
       items: cartItems.map((item) => ({
         title: item.title,
         level: item.level || 'N/A',
-        quantity: item.quantity || 1,
+        quantity: item.quantity || 'N/A',
         price: item.price,
       })),
       subtotal,
@@ -96,7 +96,7 @@ const OrderSummaryPage = () => {
                 <tr key={index}>
                   <td>{item.title}</td>
                   <td>{item.level || 'N/A'}</td>
-                  <td>{item.quantity || 1}</td>
+                  <td>{item.quantity || 'N/A'}</td>
                   <td>₹{item.price.toFixed(2)}</td>
                   <td>₹{(item.price * (item.quantity || 1)).toFixed(2)}</td>
                 </tr>
@@ -109,18 +109,14 @@ const OrderSummaryPage = () => {
             <hr />
             <h4 className="text-success">Grand Total: ₹{total.toFixed(2)}</h4>
 
-            <Button
-              variant="success"
-              className="mt-3"
-              onClick={handleConfirmOrder}
-            >
+            <Button onClick={handleConfirmOrder} style={{background:'green', border: 'none', width:'20%'}}>
               Confirm Order
             </Button>
           </div>
         </>
       )}
 
-      <Button variant="secondary" className="mt-4" onClick={() => navigate('/view-cart')}>
+      <Button style={{background:'blue', border: 'none', width:'20%'}} onClick={() => navigate('/view-cart')}>
         Back to Cart
       </Button>
 

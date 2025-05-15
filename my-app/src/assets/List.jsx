@@ -19,7 +19,7 @@ function Teacher() {
               and share your expertise with learners worldwide.
             </p>
             <h1>Enjoy Many Perks</h1>
-            <div className="felx">
+            <div className="flex">
               <ul>
                 <li>Global Impact</li>
                 <li>Flexible Schedule</li>

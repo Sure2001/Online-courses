@@ -8,7 +8,7 @@ const ConfirmPage = () => {
     // Redirect to home after 3 seconds
     const timer = setTimeout(() => {
       navigate('/');
-    }, 3000);
+    }, 1000);
 
     return () => clearTimeout(timer); // Cleanup on unmount
   }, [navigate]);
