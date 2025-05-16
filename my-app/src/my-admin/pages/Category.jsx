@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal, Button, Form } from "react-bootstrap";
-import { FaTrashAlt, FaFileExcel, FaFileCsv, FaEdit, FaEye, FaRegPlusSquare } from "react-icons/fa";
+import {
+  FaTrashAlt,
+  FaFileExcel,
+  FaFileCsv,
+  FaEdit,
+  FaEye,
+  FaRegPlusSquare,
+  FaTimes,
+  FaSave,
+} from "react-icons/fa";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
@@ -98,13 +107,19 @@ const AdminCategory = () => {
         Status: cat.status,
       }))
     );
-    saveAs(new Blob([csv], { type: "text/csv;charset=utf-8;" }), "categories.csv");
+    saveAs(
+      new Blob([csv], { type: "text/csv;charset=utf-8;" }),
+      "categories.csv"
+    );
   };
 
   const handleUpdateCategory = (e) => {
     e.preventDefault();
     axios
-      .put(`http://localhost:5000/api/categories/${editCategory._id}`, editCategory)
+      .put(
+        `http://localhost:5000/api/categories/${editCategory._id}`,
+        editCategory
+      )
       .then((res) => {
         setShowEditModal(false);
         setEditCategory(null);
@@ -115,14 +130,16 @@ const AdminCategory = () => {
       .catch((err) => console.error("Update error:", err));
   };
 
-  const paginatedData = categories.slice((currentPage - 1) * limit, currentPage * limit);
+  const paginatedData = categories.slice(
+    (currentPage - 1) * limit,
+    currentPage * limit
+  );
   const totalPages = Math.ceil(categories.length / limit);
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>Category Management</h3>
-        
       </div>
 
       {/* --- Search + Export + Bulk Delete --- */}
@@ -136,14 +153,27 @@ const AdminCategory = () => {
           style={{ width: "300px" }}
         />
         <div className="d-flex gap-3 align-items-center">
-          <button style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
-                  title="Add New Banner" onClick={() => setShowAddModal(true)}>
-          <FaRegPlusSquare />
-        </button>
+          <button
+            style={{
+              border: "none",
+              color: "green",
+              fontSize: "32px",
+              background: "transparent",
+            }}
+            title="Add New Banner"
+            onClick={() => setShowAddModal(true)}
+          >
+            <FaRegPlusSquare />
+          </button>
           {selectedCategories.length > 0 && (
             <button
               title="Delete selected"
-              style={{ border: "none", color: "red", fontSize: "32px", background: "transparent" }}
+              style={{
+                border: "none",
+                color: "red",
+                fontSize: "32px",
+                background: "transparent",
+              }}
               onClick={handleBulkDelete}
             >
               <FaTrashAlt />
@@ -151,14 +181,24 @@ const AdminCategory = () => {
           )}
           <button
             title="Export to CSV"
-            style={{ border: "none", color: "lightblue", fontSize: "32px", background: "transparent" }}
+            style={{
+              border: "none",
+              color: "lightblue",
+              fontSize: "32px",
+              background: "transparent",
+            }}
             onClick={exportToCSV}
           >
             <FaFileCsv />
           </button>
           <button
             title="Export to Excel"
-            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
+            style={{
+              border: "none",
+              color: "green",
+              fontSize: "32px",
+              background: "transparent",
+            }}
             onClick={exportToExcel}
           >
             <FaFileExcel />
@@ -167,7 +207,13 @@ const AdminCategory = () => {
       </div>
 
       {/* --- Table --- */}
-      <div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "5px" }}>
+      <div
+        style={{
+          border: "1px solid #ccc",
+          padding: "20px",
+          borderRadius: "5px",
+        }}
+      >
         <table className="table table-bordered text-center">
           <thead>
             <tr>
@@ -210,7 +256,12 @@ const AdminCategory = () => {
                 <td>{cat.status}</td>
                 <td>
                   <button
-                    style={{ border: "none", color: "blue", background: "transparent", marginRight: "10px" }}
+                    style={{
+                      border: "none",
+                      color: "blue",
+                      background: "transparent",
+                      marginRight: "10px",
+                    }}
                     onClick={() => {
                       setEditCategory(cat);
                       setShowEditModal(true);
@@ -219,7 +270,12 @@ const AdminCategory = () => {
                     <FaEdit />
                   </button>
                   <button
-                    style={{ border: "none", color: "green", background: "transparent", marginRight: "10px" }}
+                    style={{
+                      border: "none",
+                      color: "green",
+                      background: "transparent",
+                      marginRight: "10px",
+                    }}
                     onClick={() => {
                       setViewCategory(cat);
                       setShowModal(true);
@@ -228,7 +284,11 @@ const AdminCategory = () => {
                     <FaEye />
                   </button>
                   <button
-                    style={{ border: "none", color: "red", background: "transparent" }}
+                    style={{
+                      border: "none",
+                      color: "red",
+                      background: "transparent",
+                    }}
                     onClick={() => handleDelete(cat._id)}
                   >
                     <FaTrashAlt />
@@ -272,7 +332,9 @@ const AdminCategory = () => {
               <Form.Label>Category Type</Form.Label>
               <Form.Select
                 value={form.type}
-                onChange={(e) => setForm({ ...form, type: e.target.value, subCategory: "" })}
+                onChange={(e) =>
+                  setForm({ ...form, type: e.target.value, subCategory: "" })
+                }
                 required
               >
                 <option value="">-- Select Type --</option>
@@ -288,7 +350,9 @@ const AdminCategory = () => {
                   type="text"
                   placeholder="Enter subcategory"
                   value={form.subCategory}
-                  onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, subCategory: e.target.value })
+                  }
                   required
                 />
               </Form.Group>
@@ -306,11 +370,35 @@ const AdminCategory = () => {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <button variant="secondary" onClick={() => setShowAddModal(false)}>
-              Cancel
+            <button
+              onClick={() => setShowAddModal(false)}
+              style={{
+                padding: "8px 12px",
+                marginRight: "10px",
+                backgroundColor: "#6c757d",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+              title="Cancel"
+            >
+              <FaTimes />
             </button>
-            <button variant="primary" type="submit">
-              Save
+
+            <button
+              type="submit"
+              style={{
+                padding: "8px 12px",
+                backgroundColor: "#0d6efd",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+              title="Save"
+            >
+              <FaSave />
             </button>
           </Modal.Footer>
         </Form>
@@ -324,9 +412,15 @@ const AdminCategory = () => {
         <Modal.Body>
           {viewCategory && (
             <>
-              <p><strong>Type:</strong> {viewCategory.type}</p>
-              <p><strong>SubCategory:</strong> {viewCategory.subCategory}</p>
-              <p><strong>Status:</strong> {viewCategory.status}</p>
+              <p>
+                <strong>Type:</strong> {viewCategory.type}
+              </p>
+              <p>
+                <strong>SubCategory:</strong> {viewCategory.subCategory}
+              </p>
+              <p>
+                <strong>Status:</strong> {viewCategory.status}
+              </p>
             </>
           )}
         </Modal.Body>
@@ -349,7 +443,11 @@ const AdminCategory = () => {
                   <Form.Select
                     value={editCategory.type}
                     onChange={(e) =>
-                      setEditCategory({ ...editCategory, type: e.target.value, subCategory: "" })
+                      setEditCategory({
+                        ...editCategory,
+                        type: e.target.value,
+                        subCategory: "",
+                      })
                     }
                     required
                   >
@@ -365,7 +463,10 @@ const AdminCategory = () => {
                     type="text"
                     value={editCategory.subCategory}
                     onChange={(e) =>
-                      setEditCategory({ ...editCategory, subCategory: e.target.value })
+                      setEditCategory({
+                        ...editCategory,
+                        subCategory: e.target.value,
+                      })
                     }
                     required
                   />
@@ -376,7 +477,10 @@ const AdminCategory = () => {
                   <Form.Select
                     value={editCategory.status}
                     onChange={(e) =>
-                      setEditCategory({ ...editCategory, status: e.target.value })
+                      setEditCategory({
+                        ...editCategory,
+                        status: e.target.value,
+                      })
                     }
                   >
                     <option value="enable">Enable</option>

@@ -52,12 +52,15 @@ const orderSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const courseSchema = new mongoose.Schema({
+  type: String,
+  subCategory: String,
   title: String,
-  category: String,
-  rating: String,
-  classes: String,
-  students: String,
-  path: String,
+  description: String,
+  image: String,
+  level: String,
+  price: Number,
+  status: String,
+  createdAt: { type: Date, default: Date.now }
 });
 const bannerSchema = new mongoose.Schema({
   title: String,
@@ -405,6 +408,62 @@ app.get("/api/courses", async (req, res) => {
     res.json({ success: true, data: courses });
   } catch (err) {
     res.status(500).json({ success: false, message: "Failed to fetch courses" });
+  }
+});
+// app.get("/api/courses", async (req, res) => {
+//   try {
+//     const courses = await Course.find();
+//     res.json(courses);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
+app.post("/api/courses", async (req, res) => {
+  try {
+    const course = new Course(req.body);
+    await course.save();
+    res.json({ success: true, data: course });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.put('/api/courses/:id', async (req, res) => {
+  const id = req.params.id;
+  // Find and update the course by id
+  const updatedCourse = await Course.findByIdAndUpdate(id, req.body, { new: true });
+  if (!updatedCourse) return res.status(404).json({ success: false, message: 'Course not found' });
+  res.json({ success: true, course: updatedCourse });
+});
+// Delete single course by ID
+app.delete("/api/courses/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedCourse = await Course.findByIdAndDelete(id);
+    if (!deletedCourse) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+    res.json({ success: true, message: "Course deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Optional: Bulk delete endpoint (if you want to do it in one request)
+app.delete("/api/courses", async (req, res) => {
+  try {
+    const { ids } = req.body; 
+    if (!Array.isArray(ids)) {
+      return res.status(400).json({ success: false, message: "Invalid IDs array" });
+    }
+    const result = await Course.deleteMany({ _id: { $in: ids } });
+    res.json({ success: true, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 

@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Container, Button, Form, Modal } from "react-bootstrap";
-import {
-  FaTrashAlt,
-  FaFileCsv,
-  FaFileExcel,
-  FaEdit,
-  FaEye,
-  FaRegPlusSquare,
-} from "react-icons/fa";
+import { FaTrashAlt, FaFileCsv, FaFileExcel, FaEdit, FaEye,FaRegPlusSquare } from "react-icons/fa";
 import * as XLSX from "xlsx";
 
 function AdminCourses() {
@@ -44,9 +37,7 @@ function AdminCourses() {
       const res = await fetch("http://localhost:5000/api/courses");
       const data = await res.json();
       if (data.success) {
-        const sorted = data.data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        const sorted = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setCourses(sorted);
       }
     } catch (err) {
@@ -60,7 +51,7 @@ function AdminCourses() {
       const data = await res.json();
       console.log(data);
       // if (data.success) {
-      setCategories(data);
+        setCategories(data);
       // }
     } catch (err) {
       console.error("Error fetching categories:", err);
@@ -87,15 +78,21 @@ function AdminCourses() {
     );
   };
 
-  const handleBulkDelete = async () => {
-    for (const id of selectedCourses) {
-      await fetch(`http://localhost:5000/api/courses/${id}`, {
-        method: "DELETE",
-      });
-    }
+ const handleBulkDelete = async () => {
+  try {
+    await fetch("http://localhost:5000/api/courses", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: selectedCourses }),
+    });
     setSelectedCourses([]);
     fetchCourses();
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Error deleting courses");
+  }
+};
+
 
   const exportToCSV = () => {
     const ws = XLSX.utils.json_to_sheet(courses);
@@ -112,19 +109,28 @@ function AdminCourses() {
   };
 
   const handleAddOrUpdateCourse = async (e) => {
-    e.preventDefault();
-    try {
-      const url = editMode
-        ? `http://localhost:5000/api/courses/${currentEditId}`
-        : "http://localhost:5000/api/courses";
-      const method = editMode ? "PUT" : "POST";
+  e.preventDefault();
+  try {
+    const url = editMode
+      ? `http://localhost:5000/api/courses/${currentEditId}`
+      : "http://localhost:5000/api/courses";
+    const method = editMode ? "PUT" : "POST";
 
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCourse),
-      });
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newCourse),
+    });
 
+    // Check if response is ok and content-type JSON
+    const contentType = res.headers.get("content-type") || "";
+    if (!res.ok) {
+      const text = await res.text();
+      alert(`Failed to save course: ${text}`);
+      return;
+    }
+
+    if (contentType.includes("application/json")) {
       const data = await res.json();
       if (data.success) {
         fetchCourses();
@@ -135,10 +141,15 @@ function AdminCourses() {
       } else {
         alert("Failed to save course");
       }
-    } catch (err) {
-      console.error(err);
+    } else {
+      alert("Unexpected response from server");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Error saving course");
+  }
+};
+
 
   const resetForm = () => {
     setNewCourse({
@@ -163,9 +174,7 @@ function AdminCourses() {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this course?")) {
-      await fetch(`http://localhost:5000/api/courses/${id}`, {
-        method: "DELETE",
-      });
+      await fetch(`http://localhost:5000/api/courses/${id}`, { method: "DELETE" });
       fetchCourses();
     }
   };
@@ -181,7 +190,7 @@ function AdminCourses() {
 
   return (
     <div className="container mt-4">
-      <h3>Course Management</h3>
+      <h3>Course </h3>
       <div className="d-flex justify-content-between mb-3">
         <input
           type="text"
@@ -196,198 +205,86 @@ function AdminCourses() {
         />
 
         <div className="d-flex align-items-center gap-3">
-          <button
-            style={{
-              border: "none",
-              color: "green",
-              fontSize: "32px",
-              background: "transparent",
-            }}
-            title="Add New Banner"
-            onClick={() => {
-              setShowModal(true);
-              resetForm();
-            }}
-          >
-            <FaRegPlusSquare />
-          </button>
+          <button style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
+                  title="Add New Banner"
+           onClick={() => { setShowModal(true); resetForm(); }}>
+                   <FaRegPlusSquare />
+                  </button>
           {selectedCourses.length > 0 && (
-            <button
-              onClick={handleBulkDelete}
-              style={{
-                color: "red",
-                border: "none",
-                background: "transparent",
-                fontSize: "35px",
-              }}
-            >
+            <button onClick={handleBulkDelete} style={{ color: "red", border: "none", background: "transparent", fontSize: "35px" }}>
               <FaTrashAlt />
             </button>
           )}
-          <button
-            onClick={exportToCSV}
-            style={{
-              color: "skyblue",
-              border: "none",
-              background: "transparent",
-              fontSize: "35px",
-            }}
-          >
+          <button onClick={exportToCSV} style={{ color: "skyblue", border: "none", background: "transparent", fontSize: "35px" }}>
             <FaFileCsv />
           </button>
-          <button
-            onClick={exportToExcel}
-            style={{
-              color: "green",
-              border: "none",
-              background: "transparent",
-              fontSize: "35px",
-            }}
-          >
+          <button onClick={exportToExcel} style={{ color: "green", border: "none", background: "transparent", fontSize: "35px" }}>
             <FaFileExcel />
           </button>
         </div>
       </div>
-      <div
-        style={{
-          border: "1px solid #ccc",
-          padding: "20px",
-          borderRadius: "5px",
-        }}
-      >
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            textAlign: "center",
-          }}
-        >
-          <thead>
-            <tr>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+<div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "5px" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+        <thead>
+          <tr>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}><Form.Check type="checkbox" onChange={handleSelectAll} checked={selectedCourses.length === currentCourses.length} /></th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Category Type</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Subcategory</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Title</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Level</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Price</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Image</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentCourses.map((course) => (
+            <tr key={course._id}>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                 <Form.Check
                   type="checkbox"
-                  onChange={handleSelectAll}
-                  checked={selectedCourses.length === currentCourses.length}
+                  checked={selectedCourses.includes(course._id)}
+                  onChange={() => handleSelectCourse(course._id)}
                 />
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Category Type
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Subcategory
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Title
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Level
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Price
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Image
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Status
-              </th>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-                Actions
-              </th>
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.type}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.subCategory}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.title}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.level}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.price}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}><img src={course.image} alt="course" style={{ width: "50px" }} /></td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.status}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                <button style={{ border: "none", color: "blue", fontSize: "18px", marginRight: "15px", background: "transparent" }} onClick={() => handleEdit(course)}><FaEdit /></button>
+                <button style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }} onClick={() => handleView(course)}><FaEye /></button>
+                <button style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }} onClick={() => handleDelete(course._id)}><FaTrashAlt /></button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {currentCourses.map((course) => (
-              <tr key={course._id}>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  <Form.Check
-                    type="checkbox"
-                    checked={selectedCourses.includes(course._id)}
-                    onChange={() => handleSelectCourse(course._id)}
-                  />
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {course.type}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {course.subCategory}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {course.title}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {course.level}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {course.price}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  <img
-                    src={course.image}
-                    alt="course"
-                    style={{ width: "50px" }}
-                  />
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {course.status}
-                </td>
-                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  <button
-                    style={{
-                      border: "none",
-                      color: "blue",
-                      fontSize: "18px",
-                      marginRight: "15px",
-                      background: "transparent",
-                    }}
-                    onClick={() => handleEdit(course)}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    style={{
-                      border: "none",
-                      color: "green",
-                      fontSize: "18px",
-                      marginRight: "15px",
-                      background: "transparent",
-                    }}
-                    onClick={() => handleView(course)}
-                  >
-                    <FaEye />
-                  </button>
-                  <button
-                    style={{
-                      border: "none",
-                      color: "red",
-                      fontSize: "18px",
-                      marginRight: "15px",
-                      background: "transparent",
-                    }}
-                    onClick={() => handleDelete(course._id)}
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="d-flex justify-content-center">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <Button
-              key={i + 1}
-              variant={currentPage === i + 1 ? "primary" : "light"}
-              onClick={() => setCurrentPage(i + 1)}
-              className="me-1"
-            >
-              {i + 1}
-            </Button>
           ))}
+        </tbody>
+      </table>
+
+      <div className="mt-3 d-flex gap-3 align-items-center">
+          <button
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            &laquo; Prev
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next &raquo;
+          </button>
         </div>
-      </div>
+</div>
       {/* Add/Edit Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
@@ -402,32 +299,22 @@ function AdminCourses() {
                 required
               >
                 <option value="">Select Type</option>
-
-                {[...new Set(categories.map((cat) => cat.type))].map(
-                  (type, i) => {
-                    return (
-                      <option key={i} value={type}>
-                        {type}
-                      </option>
-                    );
-                  }
-                )}
+               
+                {[...new Set(categories.map(cat => cat.type))].map((type, i) => {
+                  return <option key={i} value={type}>{type}</option>
+                })}
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-2">
               <Form.Select
                 value={newCourse.subCategory}
-                onChange={(e) =>
-                  setNewCourse({ ...newCourse, subCategory: e.target.value })
-                }
+                onChange={(e) => setNewCourse({ ...newCourse, subCategory: e.target.value })}
                 required
               >
                 <option value="">Select Subcategory</option>
                 {filteredSubCategories.map((cat, i) => (
-                  <option key={i} value={cat.subCategory}>
-                    {cat.subCategory}
-                  </option>
+                  <option key={i} value={cat.subCategory}>{cat.subCategory}</option>
                 ))}
               </Form.Select>
             </Form.Group>
@@ -437,9 +324,7 @@ function AdminCourses() {
               <Form.Control
                 type="text"
                 value={newCourse.title}
-                onChange={(e) =>
-                  setNewCourse({ ...newCourse, title: e.target.value })
-                }
+                onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
                 required
               />
             </Form.Group>
@@ -450,9 +335,7 @@ function AdminCourses() {
                 as="textarea"
                 rows={3}
                 value={newCourse.description}
-                onChange={(e) =>
-                  setNewCourse({ ...newCourse, description: e.target.value })
-                }
+                onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
                 required
               />
             </Form.Group>
@@ -462,9 +345,7 @@ function AdminCourses() {
               <Form.Control
                 type="text"
                 value={newCourse.level}
-                onChange={(e) =>
-                  setNewCourse({ ...newCourse, level: e.target.value })
-                }
+                onChange={(e) => setNewCourse({ ...newCourse, level: e.target.value })}
                 required
               />
             </Form.Group>
@@ -474,9 +355,7 @@ function AdminCourses() {
               <Form.Control
                 type="number"
                 value={newCourse.price}
-                onChange={(e) =>
-                  setNewCourse({ ...newCourse, price: e.target.value })
-                }
+                onChange={(e) => setNewCourse({ ...newCourse, price: e.target.value })}
                 required
               />
             </Form.Group>
@@ -486,9 +365,7 @@ function AdminCourses() {
               <Form.Control
                 type="text"
                 value={newCourse.image}
-                onChange={(e) =>
-                  setNewCourse({ ...newCourse, image: e.target.value })
-                }
+                onChange={(e) => setNewCourse({ ...newCourse, image: e.target.value })}
                 required
               />
             </Form.Group>
@@ -497,18 +374,14 @@ function AdminCourses() {
               <Form.Label>Status</Form.Label>
               <Form.Select
                 value={newCourse.status}
-                onChange={(e) =>
-                  setNewCourse({ ...newCourse, status: e.target.value })
-                }
+                onChange={(e) => setNewCourse({ ...newCourse, status: e.target.value })}
               >
                 <option value="Enable">Enable</option>
                 <option value="Disable">Disable</option>
               </Form.Select>
             </Form.Group>
 
-            <Button type="submit" variant="success">
-              {editMode ? "Update" : "Add"} Course
-            </Button>
+            <Button type="submit" variant="success">{editMode ? "Update" : "Add"} Course</Button>
           </Form>
         </Modal.Body>
       </Modal>

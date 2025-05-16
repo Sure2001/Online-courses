@@ -5,11 +5,11 @@ import {
   FaTrashAlt,
   FaFileCsv,
   FaFileExcel,
-  FaEye,FaRegPlusSquare,
+  FaEye,
+  FaRegPlusSquare,
 } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-
 
 const AdminBanner = () => {
   const [title, setTitle] = useState("");
@@ -90,7 +90,7 @@ const AdminBanner = () => {
   //   }
   // };
 
-    const handleDelete = async (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this banner?")) return;
     try {
       const res = await fetch(`${API_URL}/banner/${id}`, { method: "DELETE" });
@@ -105,19 +105,18 @@ const AdminBanner = () => {
     }
   };
 
- const handleBulkDelete = async () => {
-  if (!window.confirm("Delete selected banners?")) return;
-  try {
-    const res = await axios.delete("http://localhost:5000/api/banner", {
-      data: { ids: selectedIds },
-    });
-    setSelectedIds([]);
-    fetchBanners(); // refresh list
-  } catch (err) {
-    console.error("Bulk delete failed", err);
-  }
-};
-
+  const handleBulkDelete = async () => {
+    if (!window.confirm("Delete selected banners?")) return;
+    try {
+      const res = await axios.delete("http://localhost:5000/api/banner", {
+        data: { ids: selectedIds },
+      });
+      setSelectedIds([]);
+      fetchBanners(); // refresh list
+    } catch (err) {
+      console.error("Bulk delete failed", err);
+    }
+  };
 
   const handleView = (banner) => {
     alert(
@@ -136,7 +135,10 @@ const AdminBanner = () => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Banners");
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, "banners.xlsx");
   };
@@ -196,8 +198,6 @@ const AdminBanner = () => {
 
   return (
     <div className="container mt-4">
-     
-
       {/* Add Banner Modal */}
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -248,152 +248,227 @@ const AdminBanner = () => {
           </Form>
         </Modal.Body>
       </Modal>
- <h3>Banner Management</h3>
+      <h3>Banner Management</h3>
       <div className="d-flex justify-content-end gap-2 mb-3">
-        <button style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
-        title="Add New Banner"
- onClick={handleShow}>
-         <FaRegPlusSquare />
+        <button
+          style={{
+            border: "none",
+            color: "green",
+            fontSize: "32px",
+            background: "transparent",
+          }}
+          title="Add New Banner"
+          onClick={handleShow}
+        >
+          <FaRegPlusSquare />
         </button>
-      
+
         {selectedIds.length > 0 && (
-          <button  style={{ border: "none", color: "red", fontSize: "32px", background: "transparent" }} title="Delete Selected Banners" onClick={handleBulkDelete}>
+          <button
+            style={{
+              border: "none",
+              color: "red",
+              fontSize: "32px",
+              background: "transparent",
+            }}
+            title="Delete Selected Banners"
+            onClick={handleBulkDelete}
+          >
             <FaTrashAlt />
           </button>
         )}
-        <button  style={{ border: "none", color: "skyblue", fontSize: "32px", background: "transparent" }} title="Export to CSV" onClick={exportToCSV}>
+        <button
+          style={{
+            border: "none",
+            color: "skyblue",
+            fontSize: "32px",
+            background: "transparent",
+          }}
+          title="Export to CSV"
+          onClick={exportToCSV}
+        >
           <FaFileCsv />
         </button>
-        <button  style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }} title="Export to Excel" onClick={exportToExcel}>
+        <button
+          style={{
+            border: "none",
+            color: "green",
+            fontSize: "32px",
+            background: "transparent",
+          }}
+          title="Export to Excel"
+          onClick={exportToExcel}
+        >
           <FaFileExcel />
         </button>
       </div>
-<div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "5px" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
-        <thead>
-          <tr>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>
-              <input
-                type="checkbox"
-                checked={
-                  currentBanners.length > 0 &&
-                  currentBanners.every((b) => selectedIds.includes(b._id))
-                }
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedIds(currentBanners.map((b) => b._id));
-                  } else {
-                    setSelectedIds([]);
-                  }
-                }}
-              />
-            </th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Title</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Description</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Image</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Toggle</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentBanners.map((banner) => (
-            <tr key={banner._id}>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+      <div
+        style={{
+          border: "1px solid #ccc",
+          padding: "20px",
+          borderRadius: "5px",
+        }}
+      >
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            textAlign: "center",
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
                 <input
                   type="checkbox"
-                  checked={selectedIds.includes(banner._id)}
-                  onChange={() =>
-                    setSelectedIds((prev) =>
-                      prev.includes(banner._id)
-                        ? prev.filter((id) => id !== banner._id)
-                        : [...prev, banner._id]
-                    )
+                  checked={
+                    currentBanners.length > 0 &&
+                    currentBanners.every((b) => selectedIds.includes(b._id))
                   }
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedIds(currentBanners.map((b) => b._id));
+                    } else {
+                      setSelectedIds([]);
+                    }
+                  }}
                 />
-              </td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{banner.title}</td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{banner.description}</td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                {banner.image && (
-                  <img
-                    src={`http://localhost:5000${banner.image}`}
-                    thumbnail
-                    style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                  />
-                )}
-              </td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                <span
-                  className={`badge ${
-                    banner.status ? "bg-success" : "bg-secondary"
-                  }`}
-                >
-                  {banner.status ? "Enabled" : "Disabled"}
-                </span>
-              </td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                <label style={switchStyle}>
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Title
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Description
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Image
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Status
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Toggle
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentBanners.map((banner) => (
+              <tr key={banner._id}>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                   <input
                     type="checkbox"
-                    checked={banner.status}
+                    checked={selectedIds.includes(banner._id)}
                     onChange={() =>
-                      toggleStatus(banner._id, banner.status)
+                      setSelectedIds((prev) =>
+                        prev.includes(banner._id)
+                          ? prev.filter((id) => id !== banner._id)
+                          : [...prev, banner._id]
+                      )
                     }
-                    style={{ opacity: 0, width: 0, height: 0 }}
                   />
-                  <span style={sliderStyle(banner.status)}>
-                    <span style={knobStyle(banner.status)} />
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {banner.title}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {banner.description}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {banner.image && (
+                    <img
+                      src={`http://localhost:5000${banner.image}`}
+                      thumbnail
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  )}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <span
+                    className={`badge ${
+                      banner.status ? "bg-success" : "bg-secondary"
+                    }`}
+                  >
+                    {banner.status ? "Enabled" : "Disabled"}
                   </span>
-                </label>
-              </td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                <button
-                 style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }}
-                  onClick={() => handleView(banner)}
-          
-                >
-                  <FaEye />
-                </button>
-                <button
-                  style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }}
-                  onClick={() => handleDelete(banner._id)}
-                >
-                  <FaTrashAlt />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <label style={switchStyle}>
+                    <input
+                      type="checkbox"
+                      checked={banner.status}
+                      onChange={() => toggleStatus(banner._id, banner.status)}
+                      style={{ opacity: 0, width: 0, height: 0 }}
+                    />
+                    <span style={sliderStyle(banner.status)}>
+                      <span style={knobStyle(banner.status)} />
+                    </span>
+                  </label>
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <button
+                    style={{
+                      border: "none",
+                      color: "green",
+                      fontSize: "18px",
+                      marginRight: "15px",
+                      background: "transparent",
+                    }}
+                    onClick={() => handleView(banner)}
+                  >
+                    <FaEye />
+                  </button>
+                  <button
+                    style={{
+                      border: "none",
+                      color: "red",
+                      fontSize: "18px",
+                      marginRight: "15px",
+                      background: "transparent",
+                    }}
+                    onClick={() => handleDelete(banner._id)}
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      {/* Pagination */}
-      <div className="mt-3 d-flex gap-3 align-items-center">
-        <button
-          style={{ border: "none", background: "transparent", color: "blue" }}
-          disabled={currentPage === 1}
-          onClick={() => {
-  setCurrentPage(currentPage - 1);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}}
-
-        >
-          Prev
-        </button>
-        <span className="mx-3">Page {currentPage} of {totalPages}</span>
-        <button
-          style={{ border: "none", background: "transparent", color: "blue" }}
-          disabled={currentPage === totalPages}
-          onClick={() => {
-  setCurrentPage(currentPage + 1);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}}
-
-        >
-          Next
-        </button>
+        {/* Pagination */}
+        <div className="mt-3 d-flex gap-3 align-items-center">
+          <button
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            disabled={currentPage === 1}
+            onClick={() => {
+              setCurrentPage(currentPage - 1);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            Prev
+          </button>
+          <span className="mx-3">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            style={{ border: "none", background: "transparent", color: "blue" }}
+            disabled={currentPage === totalPages}
+            onClick={() => {
+              setCurrentPage(currentPage + 1);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            Next
+          </button>
+        </div>
       </div>
-    </div>
     </div>
   );
 };
