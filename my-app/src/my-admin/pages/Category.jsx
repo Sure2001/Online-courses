@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Modal, Button, Form } from "react-bootstrap";
-import { FaTrashAlt, FaFileExcel, FaFileCsv, FaEdit, FaEye } from "react-icons/fa";
+import { FaTrashAlt, FaFileExcel, FaFileCsv, FaEdit, FaEye, FaRegPlusSquare } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
@@ -17,6 +17,7 @@ const AdminCategory = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [viewCategory, setViewCategory] = useState(null);
   const [editCategory, setEditCategory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -42,11 +43,8 @@ const AdminCategory = () => {
     axios
       .post("http://localhost:5000/api/categories", form)
       .then(() => {
-        setForm({
-          type: "",
-          subCategory: "",
-          status: "enable",
-        });
+        setForm({ type: "", subCategory: "", status: "enable" });
+        setShowAddModal(false);
         fetchCategories();
       })
       .catch((err) => {
@@ -103,75 +101,29 @@ const AdminCategory = () => {
     saveAs(new Blob([csv], { type: "text/csv;charset=utf-8;" }), "categories.csv");
   };
 
- const handleUpdateCategory = (e) => {
-  e.preventDefault();
-
-  axios
-    .put(`http://localhost:5000/api/categories/${editCategory._id}`, editCategory)
-    .then((res) => {
-      console.log("Updated:", res.data);
-      setShowEditModal(false);
-      setEditCategory(null);
-      setCategories((prev) =>
-        prev.map((cat) =>
-          cat._id === res.data._id ? res.data : cat
-        )
-      ); // Update the local state manually
-    })
-    .catch((err) => console.error("Update error:", err));
-};
-
+  const handleUpdateCategory = (e) => {
+    e.preventDefault();
+    axios
+      .put(`http://localhost:5000/api/categories/${editCategory._id}`, editCategory)
+      .then((res) => {
+        setShowEditModal(false);
+        setEditCategory(null);
+        setCategories((prev) =>
+          prev.map((cat) => (cat._id === res.data._id ? res.data : cat))
+        );
+      })
+      .catch((err) => console.error("Update error:", err));
+  };
 
   const paginatedData = categories.slice((currentPage - 1) * limit, currentPage * limit);
   const totalPages = Math.ceil(categories.length / limit);
 
   return (
     <div className="container mt-4">
-      <h3>Add Categories</h3>
-
-      {/* --- Form --- */}
-      <Form onSubmit={handleSubmit} className="mb-4">
-        <Form.Group className="mb-2">
-          <Form.Label>Category Type</Form.Label>
-          <Form.Select
-            value={form.type}
-            onChange={(e) => setForm({ ...form, type: e.target.value, subCategory: "" })}
-            required
-          >
-            <option value="">-- Select Type --</option>
-            <option value="coding">Coding</option>
-            <option value="non-coding">Non-Coding</option>
-          </Form.Select>
-        </Form.Group>
-
-        {form.type && (
-          <Form.Group className="mb-2">
-            <Form.Label>SubCategory Name</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter subcategory"
-              value={form.subCategory}
-              onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
-              required
-            />
-          </Form.Group>
-        )}
-
-        <Form.Group className="mb-2">
-          <Form.Label>Status</Form.Label>
-          <Form.Select
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-          >
-            <option value="enable">Enable</option>
-            <option value="disable">Disable</option>
-          </Form.Select>
-        </Form.Group>
-
-        <button style={{ backgroundColor: "#007bff", color: "white" }} type="submit">
-          Submit
-        </button>
-      </Form>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h3>Category Management</h3>
+        
+      </div>
 
       {/* --- Search + Export + Bulk Delete --- */}
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -184,6 +136,10 @@ const AdminCategory = () => {
           style={{ width: "300px" }}
         />
         <div className="d-flex gap-3 align-items-center">
+          <button style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
+                  title="Add New Banner" onClick={() => setShowAddModal(true)}>
+          <FaRegPlusSquare />
+        </button>
           {selectedCategories.length > 0 && (
             <button
               title="Delete selected"
@@ -195,7 +151,7 @@ const AdminCategory = () => {
           )}
           <button
             title="Export to CSV"
-            style={{ border: "none", color: "green", fontSize: "32px", background: "transparent" }}
+            style={{ border: "none", color: "lightblue", fontSize: "32px", background: "transparent" }}
             onClick={exportToCSV}
           >
             <FaFileCsv />
@@ -254,7 +210,7 @@ const AdminCategory = () => {
                 <td>{cat.status}</td>
                 <td>
                   <button
-                    style={{ border: "none", color: "blue", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                    style={{ border: "none", color: "blue", background: "transparent", marginRight: "10px" }}
                     onClick={() => {
                       setEditCategory(cat);
                       setShowEditModal(true);
@@ -263,7 +219,7 @@ const AdminCategory = () => {
                     <FaEdit />
                   </button>
                   <button
-                    style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                    style={{ border: "none", color: "green", background: "transparent", marginRight: "10px" }}
                     onClick={() => {
                       setViewCategory(cat);
                       setShowModal(true);
@@ -272,7 +228,7 @@ const AdminCategory = () => {
                     <FaEye />
                   </button>
                   <button
-                    style={{ border: "none", color: "red", fontSize: "18px", marginRight: "15px", background: "transparent" }}
+                    style={{ border: "none", color: "red", background: "transparent" }}
                     onClick={() => handleDelete(cat._id)}
                   >
                     <FaTrashAlt />
@@ -304,6 +260,61 @@ const AdminCategory = () => {
           </button>
         </div>
       </div>
+
+      {/* --- Add Category Modal --- */}
+      <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add New Category</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSubmit}>
+          <Modal.Body>
+            <Form.Group className="mb-2">
+              <Form.Label>Category Type</Form.Label>
+              <Form.Select
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value, subCategory: "" })}
+                required
+              >
+                <option value="">-- Select Type --</option>
+                <option value="coding">Coding</option>
+                <option value="non-coding">Non-Coding</option>
+              </Form.Select>
+            </Form.Group>
+
+            {form.type && (
+              <Form.Group className="mb-2">
+                <Form.Label>SubCategory Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter subcategory"
+                  value={form.subCategory}
+                  onChange={(e) => setForm({ ...form, subCategory: e.target.value })}
+                  required
+                />
+              </Form.Group>
+            )}
+
+            <Form.Group className="mb-2">
+              <Form.Label>Status</Form.Label>
+              <Form.Select
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+              >
+                <option value="enable">Enable</option>
+                <option value="disable">Disable</option>
+              </Form.Select>
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <button variant="secondary" onClick={() => setShowAddModal(false)}>
+              Cancel
+            </button>
+            <button variant="primary" type="submit">
+              Save
+            </button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
 
       {/* --- View Modal --- */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>

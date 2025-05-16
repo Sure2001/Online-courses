@@ -398,6 +398,15 @@ app.put("/api/categories/:id", async (req, res) => {
 });
 
 
+// Example route in Express
+app.get("/api/courses", async (req, res) => {
+  try {
+    const courses = await Course.find(); // Assuming a Mongoose model called Course
+    res.json({ success: true, data: courses });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to fetch courses" });
+  }
+});
 
 
 // Start server

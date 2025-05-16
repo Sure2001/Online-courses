@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Table, Container, Button, Form, Modal } from "react-bootstrap";
-import { FaTrashAlt, FaFileCsv, FaFileExcel, FaEdit, FaEye } from "react-icons/fa";
+import {
+  FaTrashAlt,
+  FaFileCsv,
+  FaFileExcel,
+  FaEdit,
+  FaEye,
+  FaRegPlusSquare,
+} from "react-icons/fa";
 import * as XLSX from "xlsx";
 
 function AdminCourses() {
@@ -11,15 +18,19 @@ function AdminCourses() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCourses, setSelectedCourses] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentEditId, setCurrentEditId] = useState(null);
+
   const [newCourse, setNewCourse] = useState({
-  categoryType: "",
-  subCategory: "",
-  description: "",
-  image: "",
-  level: "",
-  price: "",
-  status: "Active"
-});
+    type: "",
+    subCategory: "",
+    title: "",
+    description: "",
+    image: "",
+    level: "",
+    price: "",
+    status: "Enable",
+  });
 
   const itemsPerPage = 5;
 
@@ -33,11 +44,13 @@ function AdminCourses() {
       const res = await fetch("http://localhost:5000/api/courses");
       const data = await res.json();
       if (data.success) {
-        const sorted = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const sorted = data.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
         setCourses(sorted);
       }
     } catch (err) {
-      console.error("Error:", err);
+      console.error("Error fetching courses:", err);
     }
   };
 
@@ -45,16 +58,16 @@ function AdminCourses() {
     try {
       const res = await fetch("http://localhost:5000/api/categories");
       const data = await res.json();
-      if (data.success) {
-        setCategories(data.data);
-      }
+      console.log(data);
+      // if (data.success) {
+      setCategories(data);
+      // }
     } catch (err) {
-      console.error("Error loading categories:", err);
+      console.error("Error fetching categories:", err);
     }
   };
-
-  const handleCategoryTypeChange = (type) => {
-    setNewCourse({ ...newCourse, categoryType: type, subCategory: "" });
+  const handleTypeChange = (type) => {
+    setNewCourse({ ...newCourse, type, subCategory: "" });
     const filtered = categories.filter((cat) => cat.type === type);
     setFilteredSubCategories(filtered);
   };
@@ -76,7 +89,9 @@ function AdminCourses() {
 
   const handleBulkDelete = async () => {
     for (const id of selectedCourses) {
-      await fetch(`http://localhost:5000/api/courses/${id}`, { method: "DELETE" });
+      await fetch(`http://localhost:5000/api/courses/${id}`, {
+        method: "DELETE",
+      });
     }
     setSelectedCourses([]);
     fetchCourses();
@@ -96,37 +111,67 @@ function AdminCourses() {
     XLSX.writeFile(wb, "courses.xlsx");
   };
 
-  const handleAddCourse = async (e) => {
+  const handleAddOrUpdateCourse = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/courses", {
-        method: "POST",
+      const url = editMode
+        ? `http://localhost:5000/api/courses/${currentEditId}`
+        : "http://localhost:5000/api/courses";
+      const method = editMode ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCourse),
       });
+
       const data = await res.json();
       if (data.success) {
         fetchCourses();
         setShowModal(false);
-        setNewCourse({
-          categoryType: "",
-          subCategory: "",
-          description: "",
-          image: "",
-          level: "",
-          price: "",
-          status: "Active"
-        });
+        setEditMode(false);
+        setCurrentEditId(null);
+        resetForm();
       } else {
-        alert("Failed to add course");
+        alert("Failed to save course");
       }
     } catch (err) {
       console.error(err);
     }
   };
 
+  const resetForm = () => {
+    setNewCourse({
+      type: "",
+      subCategory: "",
+      title: "",
+      description: "",
+      image: "",
+      level: "",
+      price: "",
+      status: "Enable",
+    });
+  };
+
+  const handleEdit = (course) => {
+    setNewCourse(course);
+    handleTypeChange(course.type);
+    setEditMode(true);
+    setCurrentEditId(course._id);
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this course?")) {
+      await fetch(`http://localhost:5000/api/courses/${id}`, {
+        method: "DELETE",
+      });
+      fetchCourses();
+    }
+  };
+
   const filteredCourses = courses.filter((c) =>
-    c.title.toLowerCase().includes(search.toLowerCase())
+    c.title?.toLowerCase().includes(search.toLowerCase())
   );
 
   const indexOfLast = currentPage * itemsPerPage;
@@ -135,8 +180,8 @@ function AdminCourses() {
   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
 
   return (
-    <Container className="mt-4">
-      <h3>Course List</h3>
+    <div className="container mt-4">
+      <h3>Course Management</h3>
       <div className="d-flex justify-content-between mb-3">
         <input
           type="text"
@@ -151,125 +196,275 @@ function AdminCourses() {
         />
 
         <div className="d-flex align-items-center gap-3">
-          <Button variant="success" onClick={() => setShowModal(true)}>Add Course</Button>
+          <button
+            style={{
+              border: "none",
+              color: "green",
+              fontSize: "32px",
+              background: "transparent",
+            }}
+            title="Add New Banner"
+            onClick={() => {
+              setShowModal(true);
+              resetForm();
+            }}
+          >
+            <FaRegPlusSquare />
+          </button>
           {selectedCourses.length > 0 && (
-            <button onClick={handleBulkDelete} style={{ color: "red", border: "none", background: "transparent", fontSize: "20px" }}>
+            <button
+              onClick={handleBulkDelete}
+              style={{
+                color: "red",
+                border: "none",
+                background: "transparent",
+                fontSize: "35px",
+              }}
+            >
               <FaTrashAlt />
             </button>
           )}
-          <button onClick={exportToCSV} style={{ color: "skyblue", border: "none", background: "transparent", fontSize: "20px" }}>
+          <button
+            onClick={exportToCSV}
+            style={{
+              color: "skyblue",
+              border: "none",
+              background: "transparent",
+              fontSize: "35px",
+            }}
+          >
             <FaFileCsv />
           </button>
-          <button onClick={exportToExcel} style={{ color: "green", border: "none", background: "transparent", fontSize: "20px" }}>
+          <button
+            onClick={exportToExcel}
+            style={{
+              color: "green",
+              border: "none",
+              background: "transparent",
+              fontSize: "35px",
+            }}
+          >
             <FaFileExcel />
           </button>
         </div>
       </div>
-
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>
-              <Form.Check type="checkbox" onChange={handleSelectAll} checked={selectedCourses.length === currentCourses.length} />
-            </th>
-            <th>Level</th>
-            <th>Price</th>
-            <th>Image</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.map((course) => (
-            <tr key={categories._id}>
-              <td>
+      <div
+        style={{
+          border: "1px solid #ccc",
+          padding: "20px",
+          borderRadius: "5px",
+        }}
+      >
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            textAlign: "center",
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
                 <Form.Check
                   type="checkbox"
-                  checked={selectedCourses.includes(course._id)}
-                  onChange={() => handleSelectCourse(course._id)}
+                  onChange={handleSelectAll}
+                  checked={selectedCourses.length === currentCourses.length}
                 />
-              </td>
-              
-              <td>{course.level}</td>
-              <td>{course.price}</td>
-              <td><img src={course.image} alt={course.title} style={{ width: "50px" }} /></td>
-              <td>{course.status}</td>
-              <td>
-                <Button variant="info" size="sm" className="me-1"><FaEye /></Button>
-                <Button variant="warning" size="sm" className="me-1"><FaEdit /></Button>
-                <Button variant="danger" size="sm"><FaTrashAlt /></Button>
-              </td>
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Category Type
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Subcategory
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Title
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Level
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Price
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Image
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Status
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Actions
+              </th>
             </tr>
+          </thead>
+          <tbody>
+            {currentCourses.map((course) => (
+              <tr key={course._id}>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <Form.Check
+                    type="checkbox"
+                    checked={selectedCourses.includes(course._id)}
+                    onChange={() => handleSelectCourse(course._id)}
+                  />
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {course.type}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {course.subCategory}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {course.title}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {course.level}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {course.price}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <img
+                    src={course.image}
+                    alt="course"
+                    style={{ width: "50px" }}
+                  />
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {course.status}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <button
+                    style={{
+                      border: "none",
+                      color: "blue",
+                      fontSize: "18px",
+                      marginRight: "15px",
+                      background: "transparent",
+                    }}
+                    onClick={() => handleEdit(course)}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    style={{
+                      border: "none",
+                      color: "green",
+                      fontSize: "18px",
+                      marginRight: "15px",
+                      background: "transparent",
+                    }}
+                    onClick={() => handleView(course)}
+                  >
+                    <FaEye />
+                  </button>
+                  <button
+                    style={{
+                      border: "none",
+                      color: "red",
+                      fontSize: "18px",
+                      marginRight: "15px",
+                      background: "transparent",
+                    }}
+                    onClick={() => handleDelete(course._id)}
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="d-flex justify-content-center">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <Button
+              key={i + 1}
+              variant={currentPage === i + 1 ? "primary" : "light"}
+              onClick={() => setCurrentPage(i + 1)}
+              className="me-1"
+            >
+              {i + 1}
+            </Button>
           ))}
-        </tbody>
-      </Table>
-
-      <div className="d-flex justify-content-center">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <Button
-            key={i + 1}
-            variant={currentPage === i + 1 ? "primary" : "light"}
-            onClick={() => setCurrentPage(i + 1)}
-            className="me-1"
-          >
-            {i + 1}
-          </Button>
-        ))}
+        </div>
       </div>
-
-      {/* Modal */}
+      {/* Add/Edit Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Add Course</Modal.Title>
+          <Modal.Title>{editMode ? "Edit Course" : "Add Course"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleAddCourse}>
+          <Form onSubmit={handleAddOrUpdateCourse}>
             <Form.Group className="mb-2">
-              <Form.Label>Category Type</Form.Label>
               <Form.Select
-                value={newCourse.categoryType}
-                onChange={(e) => handleCategoryTypeChange(e.target.value)}
+                value={newCourse.type}
+                onChange={(e) => handleTypeChange(e.target.value)}
                 required
               >
                 <option value="">Select Type</option>
-                {[...new Set(categories.map((cat) => cat.type))].map((type, i) => (
-                  <option key={i} value={type}>{type}</option>
-                ))}
+
+                {[...new Set(categories.map((cat) => cat.type))].map(
+                  (type, i) => {
+                    return (
+                      <option key={i} value={type}>
+                        {type}
+                      </option>
+                    );
+                  }
+                )}
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-2">
-              <Form.Label>Subcategory</Form.Label>
               <Form.Select
                 value={newCourse.subCategory}
-                onChange={(e) => setNewCourse({ ...newCourse, subCategory: e.target.value })}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, subCategory: e.target.value })
+                }
                 required
               >
                 <option value="">Select Subcategory</option>
                 {filteredSubCategories.map((cat, i) => (
-                  <option key={i} value={cat.subCategory}>{cat.subCategory}</option>
+                  <option key={i} value={cat.subCategory}>
+                    {cat.subCategory}
+                  </option>
                 ))}
               </Form.Select>
             </Form.Group>
 
-            
+            <Form.Group className="mb-2">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type="text"
+                value={newCourse.title}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, title: e.target.value })
+                }
+                required
+              />
+            </Form.Group>
+
             <Form.Group className="mb-2">
               <Form.Label>Description</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
                 value={newCourse.description}
-                onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, description: e.target.value })
+                }
                 required
               />
             </Form.Group>
 
             <Form.Group className="mb-2">
-              <Form.Label>Course Level</Form.Label>
+              <Form.Label>Level</Form.Label>
               <Form.Control
                 type="text"
                 value={newCourse.level}
-                onChange={(e) => setNewCourse({ ...newCourse, level: e.target.value })}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, level: e.target.value })
+                }
                 required
               />
             </Form.Group>
@@ -279,7 +474,9 @@ function AdminCourses() {
               <Form.Control
                 type="number"
                 value={newCourse.price}
-                onChange={(e) => setNewCourse({ ...newCourse, price: e.target.value })}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, price: e.target.value })
+                }
                 required
               />
             </Form.Group>
@@ -289,7 +486,9 @@ function AdminCourses() {
               <Form.Control
                 type="text"
                 value={newCourse.image}
-                onChange={(e) => setNewCourse({ ...newCourse, image: e.target.value })}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, image: e.target.value })
+                }
                 required
               />
             </Form.Group>
@@ -298,18 +497,22 @@ function AdminCourses() {
               <Form.Label>Status</Form.Label>
               <Form.Select
                 value={newCourse.status}
-                onChange={(e) => setNewCourse({ ...newCourse, status: e.target.value })}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, status: e.target.value })
+                }
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="Enable">Enable</option>
+                <option value="Disable">Disable</option>
               </Form.Select>
             </Form.Group>
 
-            <Button type="submit" variant="success">Add Course</Button>
+            <Button type="submit" variant="success">
+              {editMode ? "Update" : "Add"} Course
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>
-    </Container>
+    </div>
   );
 }
 

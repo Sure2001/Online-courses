@@ -24,23 +24,27 @@ const Order = ({ onOrderCountChange }) => {
 
   const LIMIT = 5;
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/orders`)
-      .then((res) => {
-        const allOrders = res.data.orders || [];
-        const filtered = allOrders.filter(
-          (o) =>
-            o.userName?.toLowerCase().includes(search.toLowerCase()) ||
-            o.userEmail?.toLowerCase().includes(search.toLowerCase())
-        );
-        const sorted = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setOrders(sorted);
-        setTotalPages(Math.ceil(filtered.length / LIMIT) || 1);
+ useEffect(() => {
+  axios
+    .get(`http://localhost:5000/api/orders`)
+    .then((res) => {
+      const allOrders = res.data.orders || [];
+      const filtered = allOrders.filter(
+        (o) =>
+          o.userName?.toLowerCase().includes(search.toLowerCase()) ||
+          o.userEmail?.toLowerCase().includes(search.toLowerCase())
+      );
+      const sorted = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setOrders(sorted);
+      setTotalPages(Math.ceil(filtered.length / LIMIT) || 1);
+
+      // Only call onOrderCountChange if it's a function
+      if (typeof onOrderCountChange === "function") {
         onOrderCountChange(filtered.length);  // Pass order count to Dashboard
-      })
-      .catch((err) => console.error("Error fetching orders:", err));
-  }, [search, currentPage, onOrderCountChange]);
+      }
+    })
+    .catch((err) => console.error("Error fetching orders:", err));
+}, [search, currentPage, onOrderCountChange]);
 
   const exportToExcel = () => {
     const flatData = orders.map((order) => ({
