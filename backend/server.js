@@ -60,6 +60,7 @@ const courseSchema = new mongoose.Schema({
   level: String,
   price: Number,
   status: String,
+  rating: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 const bannerSchema = new mongoose.Schema({
@@ -463,6 +464,15 @@ app.delete("/api/courses", async (req, res) => {
     res.json({ success: true, deletedCount: result.deletedCount });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+app.get("/api/courses/:id", async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) return res.status(404).json({ success: false, message: "Course not found" });
+    res.json({ success: true, data: course });
+  } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });

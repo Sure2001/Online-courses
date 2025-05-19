@@ -11,38 +11,65 @@ const NavigationBar = () => {
   const { cartItems } = useCart();
   const [showPopup, setShowPopup] = useState(false);
   const cartRef = useRef(null);
+  const [subCategoryMap, setSubCategoryMap] = useState({}); // { subCategory: [courses] }
+
   const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
-  // Close cart dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (cartRef.current && !cartRef.current.contains(event.target)) {
         setShowPopup(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/courses");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          const map = {};
+          data.data.forEach((course) => {
+            const subCat = course.subCategory?.trim();
+            if (subCat) {
+              if (!map[subCat]) map[subCat] = [];
+              map[subCat].push({
+                title: course.title,
+                path: `/course/${course._id}`, // Use course._id for routing
+              });
+            }
+          });
+          setSubCategoryMap(map);
+        }
+      } catch (err) {
+        console.error("Failed to fetch courses", err);
+      }
     };
+
+    fetchCourses();
   }, []);
 
   return (
     <Navbar bg="light" expand="lg" className="border-bottom shadow-sm py-3">
       <Container>
         <Navbar.Brand as={Link} to="/">Etech.</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between">
+        <Navbar.Toggle aria-controls="main-navbar" />
+        <Navbar.Collapse id="main-navbar" className="justify-content-between">
           <Nav className="me-auto">
-            <NavDropdown title="Courses" id="courses-dropdown" className="multi-column-dropdown">
-              <div className="dropdown-grid">
-                <NavDropdown.Item as={Link} to="/frontend">Full Stack Development</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/mobileapp">Mobile App Development</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/softwaretesting">Software Testing Course</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/datascience">Data Science Course</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/uiux">UI/UX Design Course</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/digitalmarketing">Digital Marketing Course</NavDropdown.Item>
-              </div>
+            {/* Dynamic Courses Dropdown by subCategory */}
+            <NavDropdown title="Courses" id="courses-dropdown">
+              {Object.entries(subCategoryMap).map(([subCategory, courses]) => (
+                <NavDropdown key={subCategory} title={subCategory} drop="end">
+                  {courses.map((course, idx) => (
+                    <NavDropdown.Item as={Link} to={course.path} key={idx}>
+                      {course.title}
+                    </NavDropdown.Item>
+                  ))}
+                </NavDropdown>
+              ))}
             </NavDropdown>
 
             <NavDropdown title="Teachers" id="teachers-dropdown">
@@ -61,11 +88,11 @@ const NavigationBar = () => {
           <div className="nav-button d-flex align-items-center position-relative" ref={cartRef}>
             <div
               className="position-relative"
-              onClick={() => setShowPopup(prev => !prev)}
+              onClick={() => setShowPopup((prev) => !prev)}
               style={{ cursor: "pointer" }}
             >
               <div className="cart d-flex align-items-center gap-1">
-                <FaShoppingCart className="card-icon" />
+                <FaShoppingCart className="cart-icon" />
                 <span>Cart</span>
                 {totalItems > 0 && (
                   <Badge bg="danger" pill className="position-absolute top-0 start-100 translate-middle">
@@ -89,9 +116,6 @@ const NavigationBar = () => {
                 <CartSummary />
               </div>
             )}
-
-            {/* <Link to="/signin" className="btn main-1 ms-3">Sign in</Link>
-            <Link to="/signup" className="btn main-2 ms-2">Sign up</Link> */}
           </div>
         </Navbar.Collapse>
       </Container>

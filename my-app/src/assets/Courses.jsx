@@ -3,10 +3,12 @@ import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Laptop from "../images/laptop.jpg";
 import "./courses.css";
+import { useCourseContext } from "./CourseContext.jsx";
 
 function Courses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { setSelectedCourse } = useCourseContext();
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -46,31 +48,46 @@ function Courses() {
             courses.map((course) => (
               <Col sm={12} md={4} lg={4} key={course._id}>
                 <div className="course-card">
-  <img src={course.image || Laptop} alt={course.title} />
-  <div className="card-list">
-    {(course.category || course.subCategory) && (
-      <ul>
-        {course.category && <li><strong>Category:</strong> {course.category}</li>}
-        {course.subCategory && <li><strong>Subcategory:</strong> {course.subCategory}</li>}
-      </ul>
-    )}
-  </div>
-  <div className="card-list-2">
-    <p>{course.title}</p>
-    {course.classes && (
-      <span><i className="bi bi-book"></i> {course.classes} classes</span>
-    )}
-    {course.students && (
-      <span><i className="bi bi-person-fill"></i> {course.students} Students</span>
-    )}
-  </div>
-  <div className="card-list-4 text-center mt-2">
-    <Link to={course.path || "#"}>
-      <button className="buy-btn">Read More</button>
-    </Link>
-  </div>
-</div>
-
+                  <img src={course.image || Laptop} alt={course.title} />
+                  <div className="card-list">
+                    {(course.type || course.subCategory) && (
+                      <ul>
+                        {course.category && (
+                          <li>
+                            <strong>Category:</strong> {course.type}
+                          </li>
+                        )}
+                        {course.subCategory && (
+                          <li>
+                            <strong></strong> {course.subCategory}
+                          </li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                  <div className="card-list-2">
+                    <p>{course.title}</p>
+                    {course.classes && (
+                      <span>
+                        <i className="bi bi-book"></i> {course.classes} classes
+                      </span>
+                    )}
+                    {course.students && (
+                      <span>
+                        <i className="bi bi-person-fill"></i> {course.students}{" "}
+                        Students
+                      </span>
+                    )}
+                  </div>
+                  <div className="card-list-4 text-center mt-2">
+                    <Link
+                      to={course.path || "#"}
+                      onClick={() => setSelectedCourse(course)}
+                    >
+                      <button className="buy-btn">Read More</button>
+                    </Link>
+                  </div>
+                </div>
               </Col>
             ))
           ) : (

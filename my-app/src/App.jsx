@@ -13,6 +13,7 @@ import SignUpPage from "./navbutton/SignUpPage";
 import SignInPage from "./navbutton/SignInPage";
 import ForgotPasswordPage from "./navbutton/ForgotPasswordPage";
 import ContactPage from "./navbutton/ContactPage";
+import CourseDetails from "./assets/CourseDetails";
 // Course
 import Frontend from "./coursepage/Fullstack";
 import Mobileapp from "./coursepage/MobileApp";
@@ -82,6 +83,8 @@ function AppRoutes() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/course/:id" element={<CourseDetails />} />
+
 
         <Route path="/frontend" element={<Frontend />} />
         <Route path="/mobileapp" element={<Mobileapp />}/>

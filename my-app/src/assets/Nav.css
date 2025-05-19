@@ -113,6 +113,11 @@
   transition: all 0.3s ease;
   border: none;
 }
+.highlight-nav {
+  background-color: #f0f8ff !important;
+  font-weight: bold;
+}
+
 .main-1 {
   display: inline-flex;
   align-items: center;

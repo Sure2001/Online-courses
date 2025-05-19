@@ -190,7 +190,7 @@ function AdminCourses() {
 
   return (
     <div className="container mt-4">
-      <h3>Course </h3>
+      <h3>Course List</h3>
       <div className="d-flex justify-content-between mb-3">
         <input
           type="text"
@@ -235,6 +235,7 @@ function AdminCourses() {
             <th style={{ border: "1px solid #ddd", padding: "8px" }}>Price</th>
             <th style={{ border: "1px solid #ddd", padding: "8px" }}>Image</th>
             <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Rating</th>
             <th style={{ border: "1px solid #ddd", padding: "8px" }}>Actions</th>
           </tr>
         </thead>
@@ -255,6 +256,7 @@ function AdminCourses() {
               <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.price}</td>
               <td style={{ border: "1px solid #ddd", padding: "8px" }}><img src={course.image} alt="course" style={{ width: "50px" }} /></td>
               <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.status}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{course.rating}</td>
               <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                 <button style={{ border: "none", color: "blue", fontSize: "18px", marginRight: "15px", background: "transparent" }} onClick={() => handleEdit(course)}><FaEdit /></button>
                 <button style={{ border: "none", color: "green", fontSize: "18px", marginRight: "15px", background: "transparent" }} onClick={() => handleView(course)}><FaEye /></button>
@@ -286,105 +288,126 @@ function AdminCourses() {
         </div>
 </div>
       {/* Add/Edit Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>{editMode ? "Edit Course" : "Add Course"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleAddOrUpdateCourse}>
-            <Form.Group className="mb-2">
-              <Form.Select
-                value={newCourse.type}
-                onChange={(e) => handleTypeChange(e.target.value)}
-                required
-              >
-                <option value="">Select Type</option>
-               
-                {[...new Set(categories.map(cat => cat.type))].map((type, i) => {
-                  return <option key={i} value={type}>{type}</option>
-                })}
-              </Form.Select>
-            </Form.Group>
+     <Modal show={showModal} onHide={() => setShowModal(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title>{editMode ? "Edit Course" : "Add New Course"}</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form onSubmit={handleAddOrUpdateCourse}>
+      <Form.Group className="mb-3">
+        <Form.Label>Category Type</Form.Label>
+        <Form.Select
+          value={newCourse.type}
+          onChange={(e) => handleTypeChange(e.target.value)}
+          required
+        >
+          <option value="">Select Type</option>
+          <option value="coding">Coding</option>
+          <option value="non-coding">Non-Coding</option>
+        </Form.Select>
+      </Form.Group>
 
-            <Form.Group className="mb-2">
-              <Form.Select
-                value={newCourse.subCategory}
-                onChange={(e) => setNewCourse({ ...newCourse, subCategory: e.target.value })}
-                required
-              >
-                <option value="">Select Subcategory</option>
-                {filteredSubCategories.map((cat, i) => (
-                  <option key={i} value={cat.subCategory}>{cat.subCategory}</option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Subcategory</Form.Label>
+        <Form.Select
+          value={newCourse.subCategory}
+          onChange={(e) => setNewCourse({ ...newCourse, subCategory: e.target.value })}
+          required
+        >
+          <option value="">Select Subcategory</option>
+          {filteredSubCategories.map((cat) => (
+            <option key={cat._id} value={cat.subCategory}>
+              {cat.subCategory}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Title</Form.Label>
-              <Form.Control
-                type="text"
-                value={newCourse.title}
-                onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
-                required
-              />
-            </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Title</Form.Label>
+        <Form.Control
+          type="text"
+          value={newCourse.title}
+          onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+          required
+        />
+      </Form.Group>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={newCourse.description}
-                onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
-                required
-              />
-            </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          value={newCourse.description}
+          onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+          required
+        />
+      </Form.Group>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Level</Form.Label>
-              <Form.Control
-                type="text"
-                value={newCourse.level}
-                onChange={(e) => setNewCourse({ ...newCourse, level: e.target.value })}
-                required
-              />
-            </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Image URL</Form.Label>
+        <Form.Control
+          type="text"
+          value={newCourse.image}
+          onChange={(e) => setNewCourse({ ...newCourse, image: e.target.value })}
+          required
+        />
+      </Form.Group>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Price</Form.Label>
-              <Form.Control
-                type="number"
-                value={newCourse.price}
-                onChange={(e) => setNewCourse({ ...newCourse, price: e.target.value })}
-                required
-              />
-            </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Level</Form.Label>
+        <Form.Control
+          type="text"
+          value={newCourse.level}
+          onChange={(e) => setNewCourse({ ...newCourse, level: e.target.value })}
+          required
+        />
+      </Form.Group>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Image URL</Form.Label>
-              <Form.Control
-                type="text"
-                value={newCourse.image}
-                onChange={(e) => setNewCourse({ ...newCourse, image: e.target.value })}
-                required
-              />
-            </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Price</Form.Label>
+        <Form.Control
+          type="number"
+          value={newCourse.price}
+          onChange={(e) => setNewCourse({ ...newCourse, price: e.target.value })}
+          required
+        />
+      </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Status</Form.Label>
-              <Form.Select
-                value={newCourse.status}
-                onChange={(e) => setNewCourse({ ...newCourse, status: e.target.value })}
-              >
-                <option value="Enable">Enable</option>
-                <option value="Disable">Disable</option>
-              </Form.Select>
-            </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Status</Form.Label>
+        <Form.Select
+          value={newCourse.status}
+          onChange={(e) => setNewCourse({ ...newCourse, status: e.target.value })}
+        >
+          <option value="Enable">Enable</option>
+          <option value="Disable">Disable</option>
+        </Form.Select>
+      </Form.Group>
+      <Form.Group className="mb-3">
+  <Form.Label>Rating (0–5)</Form.Label>
+  <Form.Control
+    type="number"
+    min="0"
+    max="5"
+    step="0.1"
+    value={newCourse.rating}
+    onChange={(e) =>
+      setNewCourse({ ...newCourse, rating: parseFloat(e.target.value) || 0 })
+    }
+    placeholder="Enter course rating"
+  />
+</Form.Group>
 
-            <Button type="submit" variant="success">{editMode ? "Update" : "Add"} Course</Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
+
+      <Button variant="primary" type="submit" className="w-100">
+        {editMode ? "Update Course" : "Add Course"}
+      </Button>
+    </Form>
+  </Modal.Body>
+</Modal>
+
+
     </div>
   );
 }
