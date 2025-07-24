@@ -139,7 +139,7 @@
 }
 .student-image {
   width: 200%;
-  border-radius: 20px;
+  /* border-radius: 20px; */
   height: 630px;
   margin-left: -330px;
   margin-top: -600px;
@@ -152,7 +152,7 @@
   display: inline-block;
   box-shadow: 5px 5px 30px 10px rgba(0, 0, 0, 0.15);
   font-family: Arial, sans-serif;
-  width: 200px;
+  width: 151px;
   font-weight: bold;
   font-size: 18px;
   line-height: 1;
@@ -186,14 +186,14 @@
 }
 .box-01 span {
   color: #a855f7;
-  top: -24px;
+  top: 8px;
   position: relative;
 }
 .box-01 p {
   color: black;
   font-size: 15px;
   margin-bottom: 0rem;
-  top: -18px;
+  top: 10px;
   position: relative;
 }
 .box-02 {

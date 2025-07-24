@@ -113,28 +113,31 @@ const LandingPage = () => {
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <div className="crile-2"></div>
-              </motion.div>
+                <div className="crile-2">
+              
 
               <motion.img
-                src={
-                  bannerData.image
-                    ? `http://localhost:5000${bannerData.image}`
-                    : "/student.png"
-                }
-                style={{
-                  width: "100%",
-                  height: "auto", // Set your preferred height
-                  objectFit: "cover", // Makes image auto-cover the container
-                  objectPosition: "center",
-                  top: "50%",
-                  display: "block",
-                }}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 1, delay: 0.8 }}
-                alt="Student"
-              />
+  src={
+    bannerData.image
+      ? `http://localhost:5000${bannerData.image}`
+      : "/student.png"
+  }
+  style={{
+    width: "200px",
+    height: "200px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    objectPosition: "center",
+    display: "block",
+    margin: "0 auto",
+  }}
+  initial={{ opacity: 0, x: 50 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 1, delay: 0.8 }}
+  alt="Student"
+/>
+</div>
+</motion.div>
 
               <motion.div
                 className="box-01"

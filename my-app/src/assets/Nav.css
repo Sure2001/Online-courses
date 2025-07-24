@@ -69,7 +69,6 @@
   width: 500px !important; /* Adjust as needed */
   padding: 1rem;
 }
-
 .dropdown-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 columns */

@@ -80,15 +80,7 @@ const AdminBanner = () => {
     }
   };
 
-  // const handleDelete = async (id) => {
-  //   if (!window.confirm("Are you sure you want to delete this banner?")) return;
-  //   try {
-  //     await axios.delete(`http://localhost:5000/api/banner/${id}`);
-  //     fetchBanners();
-  //   } catch (err) {
-  //     console.error("Failed to delete banner", err);
-  //   }
-  // };
+
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this banner?")) return;
